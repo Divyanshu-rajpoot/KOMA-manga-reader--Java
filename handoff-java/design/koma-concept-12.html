@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KOMA — Concept 12 · Ink Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;700;800&family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;600;800&family=Kaisei+Opti:wght@400;700&family=DotGothic16&family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@500;700;800&family=Nunito:wght@400;600;800&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= CONCEPT TOKENS ================= */
+:root{--ease:cubic-bezier(.2,.8,.2,1)}
+body.c-tone {--bg:#F4F1EA;--bg2:#E9E4D8;--panel:#FFFFFF;--text:#111111;--muted:#55524C;--ink:#111111;--onInk:#F4F1EA;--acc:#E3242B;--acc2:#111111;--line:rgba(17,17,17,.16);--fd:'Anton',sans-serif;--fb:'Archivo',sans-serif;--rad:0px;--tb:#111;--tbt:#F4F1EA;--rbg:#ECE8DF;--rtext:#111;--rframe:#111}
+body.c-ukiyo{--bg:#EFE6D2;--bg2:#E4D8BF;--panel:#F7F0E1;--text:#1B2A40;--muted:#5C6270;--ink:#1E3557;--onInk:#F7F0E1;--acc:#CF5B32;--acc2:#6B7F4E;--line:rgba(30,53,87,.18);--fd:'Shippori Mincho',serif;--fb:'Zen Kaku Gothic New',sans-serif;--rad:4px;--tb:#E4D8BF;--tbt:#1E3557;--rbg:#16263F;--rtext:#EFE6D2;--rframe:#EFE6D2}
+body.c-neon {--bg:#0E0D16;--bg2:#15131F;--panel:#1A1827;--text:#EEEAF7;--muted:#9E98B3;--ink:#EEEAF7;--onInk:#0E0D16;--acc:#FF7A66;--acc2:#6FE3C1;--line:rgba(238,234,247,.1);--fd:'Plus Jakarta Sans',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--rad:18px;--tb:#0E0D16;--tbt:#9E98B3;--rbg:#09080F;--rtext:#EEEAF7;--rframe:#2A2740}
+body.c-zen  {--bg:#FAFAF7;--bg2:#F1F0EB;--panel:#FFFFFF;--text:#1A1A1A;--muted:#6E6E69;--ink:#1A1A1A;--onInk:#FAFAF7;--acc:#C8372A;--acc2:#1A1A1A;--line:rgba(26,26,26,.1);--fd:'Shippori Mincho',serif;--fb:'Zen Kaku Gothic New',sans-serif;--rad:2px;--tb:#FAFAF7;--tbt:#6E6E69;--rbg:#F4F3EE;--rtext:#1A1A1A;--rframe:transparent}
+body.c-riso {--bg:#F6F1E6;--bg2:#EDE5D3;--panel:#FFFDF7;--text:#1D1D1B;--muted:#5A5650;--ink:#1D1D1B;--onInk:#F6F1E6;--acc:#FF48B0;--acc2:#0078BF;--y:#FFE800;--line:rgba(29,29,27,.18);--fd:'Bricolage Grotesque',sans-serif;--fb:'Bricolage Grotesque',sans-serif;--rad:10px;--tb:#0078BF;--tbt:#F6F1E6;--rbg:#0078BF;--rtext:#F6F1E6;--rframe:#FF48B0}
+
+body.c-emaki {--bg:#1E1626;--bg2:#2A2033;--panel:#2A2033;--text:#F3E9DC;--muted:#B9ABBA;--ink:#C9A45C;--onInk:#1E1626;--acc:#E8B4BC;--acc2:#C9A45C;--line:rgba(201,164,92,.22);--fd:'Kaisei Opti',serif;--fb:'Zen Kaku Gothic New',sans-serif;--rad:6px;--tb:#170F1E;--tbt:#C9A45C;--rbg:#140E1A;--rtext:#F3E9DC;--rframe:#C9A45C}
+body.c-arcade{--bg:#0F1B2E;--bg2:#17284A;--panel:#13223D;--text:#F2F5FF;--muted:#A3B3D2;--ink:#33E1FF;--onInk:#0F1B2E;--acc:#FF3366;--acc2:#FFD23F;--line:rgba(51,225,255,.2);--fd:'DotGothic16',sans-serif;--fb:'Outfit',sans-serif;--rad:0px;--tb:#0A1322;--tbt:#33E1FF;--rbg:#0A1322;--rtext:#F2F5FF;--rframe:#33E1FF}
+body.c-card  {--bg:#EDEDE8;--bg2:#E0E0DA;--panel:#F7F7F3;--text:#0A0A0A;--muted:#55554F;--ink:#0A0A0A;--onInk:#EDEDE8;--acc:#FF5B00;--acc2:#0A0A0A;--line:rgba(10,10,10,.22);--fd:'Inter Tight',sans-serif;--fb:'IBM Plex Mono',monospace;--rad:0px;--tb:#0A0A0A;--tbt:#EDEDE8;--rbg:#E0E0DA;--rtext:#0A0A0A;--rframe:#0A0A0A}
+body.c-pastel{--bg:#F5F2FF;--bg2:#ECE7FB;--panel:#FFFFFF;--text:#2B2A3D;--muted:#625F78;--ink:#2B2A3D;--onInk:#FFFFFF;--acc:#FF9E8A;--acc2:#7FB8FF;--line:rgba(43,42,61,.1);--fd:'Nunito',sans-serif;--fb:'Nunito',sans-serif;--rad:22px;--tb:#ECE7FB;--tbt:#625F78;--rbg:#ECE7FB;--rtext:#2B2A3D;--rframe:transparent}
+body.c-hud   {--bg:#0A0E11;--bg2:#111820;--panel:#0F151B;--text:#DCE6EB;--muted:#8499A3;--ink:#FF8A00;--onInk:#0A0E11;--acc:#FF8A00;--acc2:#5FD4FF;--line:rgba(143,163,173,.18);--fd:'Chakra Petch',sans-serif;--fb:'Chakra Petch',sans-serif;--rad:0px;--tb:#070A0C;--tbt:#FF8A00;--rbg:#070A0C;--rtext:#DCE6EB;--rframe:rgba(255,138,0,.6)}
+
+body.c-ink{--panel2:#FFFFFF}
+body.c-ink.dark{--bg:#121110;--bg2:#1E1C1A;--panel:#191816;--panel2:#1F1D1A;--text:#EDE8DD;--muted:#A9A296;--ink:#EDE8DD;--onInk:#121110;--acc:#EC4237;--line:rgba(237,232,221,.18);--tb:#0A0908;--tbt:#EDE8DD;--rbg:#0D0C0B;--rtext:#EDE8DD;--rframe:#EDE8DD}
+body.c-ink.dark .lc{background:var(--panel2);border-color:var(--ink);color:var(--text)}
+body.c-ink.dark .lc.c2{background:#2C2A26}
+body.c-ink.dark .lch{border-color:var(--ink)}
+body.c-ink.dark .lc td{border-color:rgba(237,232,221,.2)}
+body.c-ink.dark .stampB{background:rgba(31,29,26,.9)}
+body.c-ink.dark .win::selection{background:#EC4237}
+body.c-ink.dark .fc.c0 .cov{box-shadow:10px 10px 0 var(--acc),0 0 0 1px #EDE8DD}
+body.c-ink.dark .prog{background:rgba(237,232,221,.15)}
+body.c-ink {--bg:#F1EEE6;--bg2:#E5E1D6;--panel:#FAF8F3;--text:#0E0E0E;--muted:#55524C;--ink:#0E0E0E;--onInk:#F1EEE6;--acc:#E3242B;--acc2:#0E0E0E;--line:rgba(14,14,14,.2);--fd:'Anton',sans-serif;--fb:'Archivo',sans-serif;--rad:0px;--tb:#0E0E0E;--tbt:#F1EEE6;--rbg:#E9E5DC;--rtext:#0E0E0E;--rframe:#0E0E0E}
+
+*{box-sizing:border-box}html,body{margin:0}
+body{background:#0B0D10;color:#E6E3DC;font-family:'Outfit',system-ui,sans-serif}
+button{font:inherit;cursor:pointer;color:inherit}
+.jp{font-family:'Noto Sans JP',sans-serif}.mono{font-family:'JetBrains Mono',monospace}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ================= PRESENTATION ================= */
+.shell{max-width:1480px;margin:0 auto;padding:26px 28px 60px}
+.head h1{margin:0;font-size:28px;font-weight:800}
+.head p{margin:6px 0 0;color:#9AA0A8;font-size:14px;max-width:820px;line-height:1.55}
+.picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 12px}
+.pk{text-align:left;background:#14171B;border:1.5px solid #252A30;border-radius:12px;padding:12px 14px;color:#E6E3DC;transition:all .2s var(--ease)}
+.pk:hover{border-color:#5A6068;transform:translateY(-2px)}
+.pk[aria-pressed="true"]{border-color:#F2C230;background:#1B1F24}
+.pk .n{font-size:11px;color:#8C929A;letter-spacing:1px}
+.pk b{display:block;font-size:16px;margin:2px 0 4px}
+.pk small{display:block;font-size:12px;color:#9AA0A8;line-height:1.35;min-height:32px}
+.pk .sw{display:flex;margin-top:10px;height:10px;border-radius:3px;overflow:hidden}
+.pk .sw i{flex:1}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:#14171B;border:1px solid #252A30;border-radius:8px;padding:10px 16px;min-height:42px;font-size:14px;color:#C8CCD2}
+.tab[aria-selected="true"]{background:#F2C230;border-color:#F2C230;color:#111;font-weight:600}
+.cap{color:#9AA0A8;font-size:14px;line-height:1.55;margin:14px 2px 0;max-width:1000px}
+.cap b{color:#EDEAE3}
+
+/* ================= WINDOW ================= */
+.win{position:relative;aspect-ratio:16/10;background:var(--bg);color:var(--text);font-family:var(--fb);border-radius:12px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06)}
+.tbar{height:36px;display:flex;align-items:center;justify-content:space-between;padding-left:14px;background:var(--tb);color:var(--tbt);font-size:12px;position:relative;z-index:5}
+.tbar .wc{display:flex;height:100%}.tbar .wc i{width:46px;display:grid;place-items:center;font-style:normal}
+#app{position:absolute;inset:36px 0 0 0;overflow:auto;scrollbar-width:thin}
+#app.noscroll{overflow:hidden}
+.in{animation:in .45s var(--ease) both}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.st>*{animation:in .5s var(--ease) both}
+.st>*:nth-child(2){animation-delay:.05s}.st>*:nth-child(3){animation-delay:.1s}.st>*:nth-child(4){animation-delay:.15s}.st>*:nth-child(5){animation-delay:.2s}.st>*:nth-child(6){animation-delay:.25s}.st>*:nth-child(7){animation-delay:.3s}.st>*:nth-child(8){animation-delay:.35s}.st>*:nth-child(n+9){animation-delay:.4s}
+
+/* ================= SHARED UI ================= */
+.nav{display:flex;align-items:center;gap:24px;padding:14px 36px}
+.logo{font-family:var(--fd);font-size:24px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:.5px}
+.logo .mk{width:28px;height:28px;background:var(--acc);display:grid;place-items:center;color:#fff;font-size:14px;font-family:'Noto Sans JP';font-weight:700;border-radius:calc(var(--rad)/2)}
+.nav .links{display:flex;gap:4px;margin-left:12px}
+.nav .links button{background:transparent;border:0;padding:9px 14px;border-radius:var(--rad);font-size:14px;color:var(--muted);min-height:40px}
+.nav .links button.cur{color:var(--text);font-weight:700;background:var(--bg2)}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--bg2);border-radius:var(--rad);padding:9px 12px;font-size:13px;color:var(--muted);width:300px}
+.search .k{margin-left:auto;font-size:11px;border:1px solid var(--line);padding:1px 6px;border-radius:3px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--ink);color:var(--onInk);padding:12px 20px;min-height:44px;border-radius:var(--rad);font-size:14px;font-weight:600;transition:transform .15s var(--ease),box-shadow .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.acc{background:var(--acc);color:#fff}
+.btn.out{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.chip{display:inline-flex;align-items:center;font-size:12px;padding:6px 11px;border-radius:999px;background:var(--bg2);color:var(--text);border:0;min-height:30px}
+.chip.on{background:var(--ink);color:var(--onInk)}
+.pad{padding:0 36px}
+.h2{font-family:var(--fd);font-size:44px;margin:0;line-height:1;font-weight:800}
+.lbl{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.cov{position:relative;aspect-ratio:3/4.3;overflow:hidden;border-radius:calc(var(--rad)/2);transition:transform .3s var(--ease),box-shadow .3s}
+.cov svg{width:100%;height:100%;display:block}
+.prog{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--acc);transform-origin:left;animation:pf 1.2s var(--ease) both}
+@keyframes pf{from{transform:scaleX(0)}}
+.ico{width:18px;height:18px;flex:none}
+.seg{display:inline-flex;background:var(--bg2);border-radius:var(--rad);padding:3px}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:calc(var(--rad)*.8);font-size:12px;min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--onInk)}
+
+/* ================= LIBRARY ================= */
+.libGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px 22px}
+.libGrid.list{grid-template-columns:1fr;gap:4px}
+.card{cursor:pointer}
+.card:hover .cov{transform:translateY(-6px)}
+.card .t{font-weight:700;font-size:14px;margin-top:10px}
+.card .s{font-size:12px;color:var(--muted);margin:2px 0 8px}
+.list .card{display:grid;grid-template-columns:46px 1.3fr .8fr .6fr .6fr 1fr;gap:18px;align-items:center;padding:7px 10px;border-radius:var(--rad)}
+.list .card:hover{background:var(--bg2)}.list .card:hover .cov{transform:none}
+.list .cov{width:46px}.list .t{margin:0}.list .s{margin:0}
+.list .x{display:block}.x{display:none;font-size:12px;color:var(--muted)}
+body.c-tone .card .cov{border:3px solid #111}
+body.c-tone .card:hover .cov{box-shadow:7px 7px 0 var(--acc)}
+body.c-ukiyo .card:hover .cov{box-shadow:0 14px 24px rgba(30,53,87,.25)}
+body.c-neon .card .cov{border-radius:14px}
+body.c-neon .card:hover .cov{box-shadow:0 16px 40px rgba(255,122,102,.28),0 0 0 1px rgba(255,255,255,.12)}
+body.c-zen .card:hover .cov{transform:translateY(-3px);box-shadow:0 1px 0 var(--acc)}
+body.c-riso .card .cov{border:2px solid #1D1D1B;border-radius:8px}
+body.c-riso .card:hover .cov{box-shadow:6px 6px 0 var(--acc2),-3px -3px 0 var(--acc);transform:rotate(-1.5deg) translateY(-4px)}
+
+/* ================= VOLUME PAGE ================= */
+.vHead{display:grid;grid-template-columns:230px 1fr;gap:40px;padding:22px 36px 6px;align-items:end}
+.stats{display:flex;gap:30px;margin:16px 0}
+.stats div{font-size:12px;color:var(--muted)}.stats b{display:block;font-size:24px;color:var(--text);font-family:var(--fd)}
+.vols{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:16px}
+.vol{cursor:pointer}.vol:hover .cov{transform:translateY(-5px)}
+.vol .m{display:flex;justify-content:space-between;font-size:12px;margin-top:7px}
+.vol .m span{color:var(--muted)}
+.vol.add .cov{display:grid;place-items:center;border:2px dashed var(--line);color:var(--muted);font-size:13px;text-align:center;background:transparent}
+.ftable{width:100%;border-collapse:collapse;font-size:12px}
+.ftable th,.ftable td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left}
+.ftable th{color:var(--muted);font-weight:500}
+
+/* ================= IMPORT ================= */
+.imp{display:grid;grid-template-columns:1.05fr 1fr;gap:30px;padding:10px 36px 30px}
+.drop{position:relative;border-radius:calc(var(--rad) + 6px);min-height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;background:var(--panel);overflow:hidden}
+.drop svg.border{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.drop svg.border rect{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:10 8;animation:march 1s linear infinite}
+@keyframes march{to{stroke-dashoffset:-36}}
+.drop .bigi{width:70px;height:70px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.flying{position:absolute;width:44px;height:60px;border-radius:4px;background:var(--acc);opacity:0;animation:fly 3.6s var(--ease) infinite}
+@keyframes fly{0%{opacity:0;transform:translate(var(--sx),-160px) rotate(-14deg)}20%{opacity:1}55%{opacity:1;transform:translate(0,0) rotate(0)}70%,100%{opacity:0;transform:translate(0,20px) scale(.6)}}
+.q{display:flex;flex-direction:column;gap:10px}
+.qi{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;background:var(--panel);border-radius:var(--rad);padding:10px 12px;border:1px solid var(--line)}
+.qi .cov{width:40px}
+.qi b{font-size:13px}.qi .mono{font-size:11px;color:var(--muted)}
+.qi .prog i{animation:pq 3.5s var(--ease) infinite}
+@keyframes pq{0%{transform:scaleX(0)}70%,100%{transform:scaleX(1)}}
+.qi .stage{font-size:11px;display:flex;gap:10px;margin-top:4px;color:var(--muted)}
+.qi .stage span.d{color:var(--text)}
+.rule{font-size:12px;background:var(--bg2);border-radius:var(--rad);padding:10px 12px;line-height:1.6}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{text-align:left;background:var(--panel);border:1.5px solid var(--line);border-radius:var(--rad);padding:12px;min-height:44px}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opt b{display:block;font-size:13px}.opt small{color:var(--muted);font-size:12px}
+
+/* ================= READER ================= */
+.rd{position:absolute;inset:0;background:var(--rbg);color:var(--rtext);overflow:hidden}
+.rTop{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:12px 22px;z-index:3}
+.rTop .ttl{text-align:center;font-family:var(--fd)}
+.rTop .ttl b{display:block;font-size:22px;letter-spacing:.5px}
+.rTop .ttl span{font-family:var(--fb);font-size:12px;opacity:.7}
+.rb{min-width:44px;height:44px;border-radius:var(--rad);border:1px solid color-mix(in srgb,var(--rtext) 22%,transparent);background:transparent;color:var(--rtext);display:grid;place-items:center;padding:0 12px;font-size:12px}
+.rb[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.rStage{position:absolute;inset:72px 0 96px;display:flex;align-items:center;justify-content:center;perspective:1800px}
+.spread{height:100%;display:flex;gap:3px;padding:10px;border:2px solid var(--rframe);border-radius:calc(var(--rad) + 8px);transition:all .4s var(--ease)}
+.pg{height:100%;aspect-ratio:1/1.42;background:#F4F1EA;position:relative;overflow:hidden;border-radius:4px}
+.pg svg{width:100%;height:100%;display:block}
+.flip{position:absolute;inset:0;transform-origin:right center;animation:turn 5s var(--ease) infinite;backface-visibility:hidden;box-shadow:inset -30px 0 40px rgba(0,0,0,.15)}
+@keyframes turn{0%,62%{transform:rotateY(0)}84%,100%{transform:rotateY(178deg)}}
+.rBot{position:absolute;left:0;right:0;bottom:0;padding:10px 22px 16px;z-index:3}
+.thumbs{display:flex;flex-direction:row-reverse;gap:6px;justify-content:center;margin-bottom:10px}
+.thumbs i{width:30px;height:42px;border-radius:3px;background:color-mix(in srgb,var(--rtext) 18%,transparent);transition:all .2s}
+.thumbs i.c{background:color-mix(in srgb,var(--rtext) 34%,transparent)}
+.thumbs i.cur{outline:2px solid var(--acc);transform:translateY(-4px);background:color-mix(in srgb,var(--rtext) 60%,transparent)}
+.scrub{display:flex;align-items:center;gap:12px;font-size:12px;opacity:.85}
+.scrub .tr{flex:1;height:4px;border-radius:4px;background:color-mix(in srgb,var(--rtext) 20%,transparent);position:relative}
+.scrub .tr i{position:absolute;right:0;top:0;bottom:0;width:68%;background:var(--acc);border-radius:4px}
+.strip{animation:auto 22s linear infinite}
+@keyframes auto{to{transform:translateY(-50%)}}
+/* concept reader flourishes */
+body.c-tone .rd::before{content:"";position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(0,0,0,.05) 0 1.2deg,transparent 1.2deg 7deg);animation:spin 140s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+body.c-tone .spread{border-width:4px;border-radius:0;box-shadow:10px 10px 0 var(--acc)}
+body.c-ukiyo .spread{border-radius:2px;box-shadow:0 0 0 8px #EFE6D2,0 0 0 9px #CF5B32}
+body.c-neon .spread{background:rgba(255,255,255,.03);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(111,227,193,.08)}
+body.c-zen .rTop,body.c-zen .rBot{opacity:.0;transition:opacity .3s}
+body.c-zen .rd:hover .rTop,body.c-zen .rd:hover .rBot{opacity:1}
+body.c-zen .zenHint{display:block}
+.zenHint{display:none;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:12px;color:var(--muted);animation:hint 4s ease infinite}
+@keyframes hint{0%,100%{opacity:.3}50%{opacity:.9}}
+body.c-riso .spread{border-width:3px;border-radius:12px;box-shadow:8px 8px 0 #FFE800}
+
+/* ================= CONCEPT 2 · TONE HOME ================= */
+.toneHome{display:grid;grid-template-columns:1.25fr .9fr .85fr;grid-template-rows:380px 270px;gap:12px;padding:6px 36px 30px}
+.tp{position:relative;border:4px solid #111;background:#fff;overflow:hidden;opacity:0;animation:slam .55s cubic-bezier(.3,1.3,.5,1) forwards}
+@keyframes slam{from{opacity:0;transform:scale(1.08) rotate(-1deg)}to{opacity:1;transform:none}}
+.tp .dots{position:absolute;inset:0;background-image:radial-gradient(#111 1.1px,transparent 1.4px);background-size:7px 7px;opacity:.14}
+.tp .burst{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg at 50% 50%,#111 0 1deg,transparent 1deg 8deg);opacity:.12;animation:spin 60s linear infinite}
+.tp1{grid-row:1/3;clip-path:polygon(0 0,100% 0,96% 100%,0 100%);display:grid;grid-template-columns:200px 1fr;gap:20px;padding:24px}
+.tp1 .cov{border:3px solid #111;align-self:start;transform:rotate(-2deg);box-shadow:8px 8px 0 #E3242B}
+.tp .vert{font-family:var(--fd);font-size:84px;line-height:.9;text-transform:uppercase;margin:0;letter-spacing:1px}
+.bubble{position:absolute;background:#fff;border:3px solid #111;border-radius:50%;padding:22px 26px;font-family:var(--fd);font-size:22px;text-transform:uppercase;animation:pop .5s cubic-bezier(.3,1.6,.5,1) .7s both}
+.bubble::after{content:"";position:absolute;left:30px;bottom:-18px;border:12px solid transparent;border-top:18px solid #111}
+@keyframes pop{from{transform:scale(0) rotate(-12deg)}to{transform:none}}
+.sfx{font-family:var(--fd);color:#E3242B;-webkit-text-stroke:2px #111;font-size:64px;line-height:1;transform:rotate(-8deg);display:inline-block;animation:pop .45s cubic-bezier(.3,1.6,.5,1) .9s both}
+.tp2{clip-path:polygon(4% 0,100% 0,100% 100%,0 100%);padding:18px 18px 18px 30px;animation-delay:.12s}
+.tp3{background:#111;color:#F4F1EA;padding:18px;animation-delay:.2s;display:flex;flex-direction:column;justify-content:space-between}
+.tp4{grid-column:2/4;clip-path:polygon(0 0,100% 0,100% 100%,2% 100%);padding:16px 18px 16px 28px;animation-delay:.28s;display:flex;align-items:center;gap:18px}
+.tp4 .burst{opacity:.18}
+.tp h4{font-family:var(--fd);font-size:24px;text-transform:uppercase;margin:0 0 10px;letter-spacing:.5px;position:relative}
+.upn{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;position:relative}
+.upn .cov{border:2px solid #111}
+.upn small{display:block;font-size:11px;margin-top:4px;font-weight:700}
+
+/* ================= CONCEPT 3 · UKIYO HOME ================= */
+.ukHero{position:relative;height:330px;margin:0 36px;border-radius:4px;overflow:hidden;background:#1E3557;color:#EFE6D2;display:grid;grid-template-columns:1fr 200px;align-items:center;padding:0 44px}
+.ukHero .waves{position:absolute;left:0;right:0;bottom:-10px;height:200px}
+.ukHero .w1{animation:wv 10s ease-in-out infinite alternate}.ukHero .w2{animation:wv 7s ease-in-out infinite alternate-reverse}
+@keyframes wv{to{transform:translateX(-40px)}}
+.ukHero .sun{position:absolute;right:300px;top:40px;width:120px;height:120px;border-radius:50%;background:#CF5B32;animation:rise2 1.4s var(--ease) both}
+@keyframes rise2{from{transform:translateY(80px);opacity:0}}
+.ukHero h2{font-family:var(--fd);font-size:64px;margin:0;font-weight:800;line-height:1}
+.ukHero .vt{position:absolute;right:250px;top:30px;writing-mode:vertical-rl;font-family:var(--fd);font-size:26px;letter-spacing:8px;color:#EFE6D2;opacity:.9}
+.ukHero .cov{transform:rotate(3deg);box-shadow:0 20px 40px rgba(0,0,0,.4);z-index:2}
+.shelf{margin:26px 36px 0;padding:18px 18px 0;background:var(--bg2);border-radius:4px 4px 0 0;position:relative}
+.shelf .bk{display:flex;align-items:flex-end;gap:5px;height:190px}
+.shelf .board{height:16px;background:#7A5634;margin:0 -18px;box-shadow:0 6px 0 #5C3F25;border-radius:0 0 2px 2px}
+.spine{width:44px;border-radius:2px 2px 0 0;position:relative;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-family:var(--fd);font-size:12.5px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:transform .3s var(--ease);padding:10px 0;overflow:hidden}
+.spine:hover{transform:translateY(-16px)}
+.spine::after{content:"";position:absolute;left:0;right:0;top:12px;height:3px;background:currentColor;opacity:.4}
+.spine .vn{position:absolute;bottom:8px;writing-mode:horizontal-tb;font-size:11px}
+.shelfLbl{display:flex;justify-content:space-between;align-items:baseline;margin:0 36px;padding-top:24px}
+.shelfLbl h3{font-family:var(--fd);font-size:22px;margin:0}
+
+/* ================= CONCEPT 4 · NEON HOME ================= */
+.neHome{padding:0 36px 30px}
+.glass{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;backdrop-filter:blur(12px)}
+.flow{position:relative;height:350px;perspective:1200px;display:flex;align-items:center;justify-content:center;margin-top:4px}
+.flow .glow{position:absolute;width:420px;height:260px;border-radius:50%;background:#FF7A66;filter:blur(90px);opacity:.25;animation:gl 5s ease-in-out infinite alternate}
+@keyframes gl{to{opacity:.4;transform:translateX(40px)}}
+.fc{position:absolute;width:190px;transition:transform .7s var(--ease),opacity .7s,filter .7s;cursor:pointer}
+.fc .cov{border-radius:14px;box-shadow:0 30px 60px rgba(0,0,0,.6)}
+.fc .lab{text-align:center;margin-top:12px;opacity:0;transition:opacity .4s}
+.fc.c0 .lab{opacity:1}
+.neRow{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-top:6px}
+.cont{display:flex;flex-direction:column;gap:8px;padding:16px}
+.ci{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:8px;border-radius:12px;transition:background .2s}
+.ci:hover{background:rgba(255,255,255,.05)}
+.ci .cov{width:44px;border-radius:8px}
+.ci b{font-size:14px}.ci small{font-size:12px;color:var(--muted)}
+.ring{width:38px;height:38px}
+.strips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px}
+.sp{height:180px;border-radius:12px;overflow:hidden;position:relative}
+.sp .strip{animation-duration:16s}
+.sp b{position:absolute;left:10px;bottom:10px;font-size:12px;background:rgba(14,13,22,.8);padding:4px 8px;border-radius:8px}
+body.c-neon .nav{margin:12px 36px 0;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+body.c-neon .logo .mk{background:linear-gradient(135deg,#FF7A66,#A99BFF)}
+
+/* ================= CONCEPT 5 · ZEN HOME ================= */
+.zen{display:grid;grid-template-columns:1fr 1fr;gap:60px;padding:30px 80px 40px;align-items:center}
+.enso{position:relative;width:380px;height:380px;margin:0 auto;display:grid;place-items:center}
+.enso svg{position:absolute;inset:0}
+.enso .brush{fill:none;stroke:#1A1A1A;stroke-width:16;stroke-linecap:round;stroke-dasharray:1100;stroke-dashoffset:1100;animation:draw 2.2s cubic-bezier(.6,.1,.2,1) .2s forwards;filter:url(#rough)}
+@keyframes draw{to{stroke-dashoffset:340}}
+.enso .cov{width:170px;box-shadow:0 20px 40px rgba(0,0,0,.12);animation:in 1s var(--ease) .6s both}
+.zen h2{font-family:var(--fd);font-size:56px;font-weight:700;margin:0;line-height:1.05}
+.zen .dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--acc);margin-left:8px;vertical-align:middle;animation:pulse 2.4s ease infinite}
+@keyframes pulse{50%{transform:scale(1.5);opacity:.6}}
+.zl{border-top:1px solid var(--line);margin:0 80px}
+.zrow{display:grid;grid-template-columns:40px 1fr 140px 120px 80px;align-items:center;gap:20px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer;position:relative}
+.zrow::before{content:"";position:absolute;left:-20px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--acc);transform:scale(0);transition:transform .25s var(--ease)}
+.zrow:hover::before{transform:scale(1)}
+.zrow .n{font-family:var(--fd);color:var(--muted)}
+.zrow small{color:var(--muted)}
+
+/* ================= CONCEPT 6 · RISO HOME ================= */
+.marq{overflow:hidden;background:#1D1D1B;color:#FFE800;font-family:'Space Mono';font-size:13px;padding:8px 0;white-space:nowrap}
+.marq div{display:inline-block;animation:mq 22s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+.bento{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:310px 290px;gap:14px;padding:18px 36px 30px}
+.bx{position:relative;border:2px solid #1D1D1B;border-radius:14px;overflow:hidden;padding:18px;animation:in .5s var(--ease) both}
+.bx h4{margin:0;font-size:13px;font-family:'Space Mono';text-transform:uppercase;letter-spacing:1px}
+.b1{grid-row:1/3;background:#FF48B0;color:#1D1D1B;display:flex;flex-direction:column}
+.b1 .big{font-size:70px;font-weight:800;line-height:.9;letter-spacing:-2px;margin:10px 0;mix-blend-mode:multiply}
+.b1 .art{position:relative;flex:1}
+.duo{position:absolute;width:190px;right:20px;bottom:10px}
+.duo .l1,.duo .l2{position:absolute;inset:0;border-radius:8px}
+.duo .l2{mix-blend-mode:multiply;animation:jit 3s steps(2) infinite}
+@keyframes jit{0%,100%{transform:translate(5px,-4px)}50%{transform:translate(3px,-6px)}}
+.sticker{position:absolute;background:#FFE800;color:#1D1D1B;border:2px solid #1D1D1B;border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px;animation:wob 2.4s ease-in-out infinite;z-index:3}
+@keyframes wob{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-2deg) scale(1.05)}}
+.b2{background:#0078BF;color:#F6F1E6}
+.b3{background:#FFE800}
+.b4{grid-column:2/4;background:#FFFDF7;display:flex;gap:14px;align-items:center}
+.b4 .cov{width:96px;border:2px solid #1D1D1B;border-radius:8px;flex:none;transition:transform .2s}
+.b4 .cov:hover{transform:rotate(-3deg) translateY(-4px)}
+.num{font-size:64px;font-weight:800;line-height:1;letter-spacing:-2px}
+
+/* dark-text accent buttons where the accent is light */
+body.c-emaki .btn.acc,body.c-pastel .btn.acc,body.c-hud .btn.acc,body.c-card .btn.acc{color:#111}
+body.c-emaki .chip.on,body.c-hud .chip.on{color:#111}
+
+/* ===== 7 · EMAKI ===== */
+.emHero{position:relative;display:grid;grid-template-columns:1.1fr 1fr;align-items:center;padding:0 60px;height:420px;overflow:hidden}
+.emT{font-family:var(--fd);font-size:76px;margin:8px 0 0;font-weight:700;line-height:1}
+.emArt{position:relative;height:100%;display:flex;align-items:center;justify-content:center}
+.moon{position:absolute;width:300px;height:300px;border-radius:50%;background:#C9A45C;box-shadow:0 0 140px rgba(201,164,92,.45);animation:moonIn 1.6s var(--ease) both}
+@keyframes moonIn{from{transform:translateY(70px) scale(.8);opacity:0}}
+.emFrame{position:relative;width:176px;padding:8px;background:#1E1626;border:1px solid #C9A45C;transform:rotate(-3deg);box-shadow:0 30px 50px rgba(0,0,0,.5);cursor:pointer;transition:transform .4s var(--ease)}
+.emFrame:hover{transform:rotate(0) translateY(-8px)}
+.petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.petals i{position:absolute;top:-20px;width:12px;height:9px;background:#E8B4BC;border-radius:12px 0 12px 0;opacity:.85;animation:petal 8s linear infinite;z-index:3}
+@keyframes petal{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(-180px,430px) rotate(560deg);opacity:0}}
+.emScroll{height:330px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.emTrack{position:relative;width:2400px;height:100%;animation:emDrift 46s linear infinite alternate}
+.emScroll:hover .emTrack{animation-play-state:paused}
+@keyframes emDrift{to{transform:translateX(-1000px)}}
+.cloud{position:absolute;left:0;top:40px;width:2400px;height:220px}
+.emCard{position:absolute;width:200px;display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:center;background:rgba(42,32,51,.92);border:1px solid rgba(201,164,92,.35);padding:8px;border-radius:6px;cursor:pointer;transition:transform .3s var(--ease),border-color .3s}
+.emCard:hover{transform:translateY(-6px);border-color:#C9A45C}
+.emCard b{font-size:13px;display:block}.emCard small{font-size:11px;color:var(--muted)}
+.emCard .dot{position:absolute;left:50%;bottom:-16px;width:8px;height:8px;border-radius:50%;background:#C9A45C}
+body.c-emaki .card:hover .cov{box-shadow:0 0 0 1px #C9A45C,0 18px 30px rgba(0,0,0,.45)}
+body.c-emaki .spread{border:1px solid #C9A45C;box-shadow:0 0 0 7px #1E1626,0 0 0 8px rgba(201,164,92,.5),0 0 80px rgba(201,164,92,.12)}
+
+/* ===== 8 · ARCADE ===== */
+.px{font-family:'Press Start 2P',monospace;font-size:10px;letter-spacing:1px;line-height:1.6}
+.arc{position:relative;padding:4px 36px 30px}
+.arc::after,body.c-arcade .rd::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px);pointer-events:none;z-index:4}
+.arcTop{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px}
+.arcT{font-family:'Press Start 2P',monospace;font-size:42px;margin:12px 0 0;color:#FF3366;text-shadow:5px 5px 0 #33E1FF;font-weight:400}
+.cd{font-family:'Press Start 2P',monospace;font-size:26px;color:#FFD23F;animation:blink 1s steps(1) infinite;margin-top:14px}
+@keyframes blink{50%{opacity:0}}
+.xp{width:380px}.xpbar{height:20px;border:3px solid #33E1FF;margin:8px 0;padding:2px}
+.xpbar i{display:block;height:100%;width:92%;background:#FFD23F;transform-origin:left;animation:pf 1.4s steps(12) both}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.slot{border:3px solid #2A4A7A;background:#13223D;padding:14px;cursor:pointer}
+.slot .cov{width:104px;flex:none;border-radius:0;border:3px solid #0F1B2E}
+.slot b{font-family:'DotGothic16',sans-serif;font-size:19px;font-weight:400;display:block}
+.slot.sel{border-color:#FFD23F;box-shadow:6px 6px 0 #FF3366;animation:bob2 .8s steps(2) infinite}
+@keyframes bob2{50%{transform:translateY(-4px)}}
+.slot:hover{border-color:#33E1FF}
+.hp{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:8px}.hp i{height:12px;background:#22385F}.hp i.on{background:#FF3366;animation:in .2s steps(2) both}
+.slot.new{display:flex;flex-direction:column;justify-content:space-between;border-style:dashed}
+.slot.new .plus{font-family:'Press Start 2P',monospace;font-size:58px;color:#33E1FF;text-align:center;animation:blink 1.4s steps(1) infinite}
+.badges{display:flex;gap:12px;flex-wrap:wrap}
+.badge2{display:flex;align-items:center;gap:10px;border:3px solid #FFD23F;padding:12px 14px;font-family:'Press Start 2P',monospace;font-size:9px;animation:in .3s steps(3) both}
+.badge2 span{font-size:16px;color:#FFD23F}
+body.c-arcade .nav .logo{font-family:'Press Start 2P',monospace;font-size:16px}
+body.c-arcade .card .cov{border:3px solid #2A4A7A;border-radius:0}
+body.c-arcade .card:hover .cov{border-color:#FFD23F;box-shadow:6px 6px 0 #FF3366;transition:all .1s steps(2)}
+body.c-arcade .spread{border:4px solid #33E1FF;border-radius:0;box-shadow:8px 8px 0 #FF3366}
+body.c-arcade .rTop .ttl b{font-family:'Press Start 2P',monospace;font-size:16px}
+
+/* ===== 9 · ARCHIVE CARD ===== */
+.bru{display:grid;grid-template-columns:1.2fr 1fr;border-top:2px solid #0A0A0A;border-bottom:2px solid #0A0A0A;margin:6px 36px 24px}
+.bL{padding:22px 28px 26px 0;border-right:2px solid #0A0A0A}
+.mono2{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px}
+.bigNo{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:150px;line-height:.9;letter-spacing:-8px;margin:12px 0 0;animation:in .6s var(--ease) both}
+.bigNo span{color:#FF5B00}
+.bT{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:54px;margin:6px 0 8px;letter-spacing:-2px;line-height:1}
+.bRow{display:flex;gap:10px;margin-top:22px}
+.bR{position:relative;display:flex;align-items:center;justify-content:center;padding:24px}
+.lcards{position:relative;width:380px;height:300px}
+.lc{position:absolute;inset:0;background:#F7F7F3;border:2px solid #0A0A0A;transition:transform .45s var(--ease)}
+.lc.c3{transform:rotate(6deg) translate(16px,6px);background:#FF5B00}
+.lc.c2{transform:rotate(-4deg) translate(-10px,4px);background:#D6D6CF}
+.lcards:hover .c3{transform:rotate(12deg) translate(70px,10px)}.lcards:hover .c2{transform:rotate(-10deg) translate(-60px,6px)}
+.lc.c1{padding:16px;animation:in .6s var(--ease) .2s both}
+.lch{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;border-bottom:2px solid #0A0A0A;padding-bottom:8px}
+.lc table{width:100%;font-family:'IBM Plex Mono',monospace;font-size:12px;border-collapse:collapse;margin-top:6px}
+.lc td{border-bottom:1px solid rgba(10,10,10,.25);padding:7px 2px}
+.stampB{position:absolute;right:18px;bottom:20px;border:3px solid #FF5B00;color:#FF5B00;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:22px;padding:6px 12px;transform:rotate(-12deg);opacity:0;animation:stampB .5s var(--ease) .9s forwards;background:rgba(247,247,243,.85)}
+@keyframes stampB{0%{transform:scale(2.2) rotate(-25deg);opacity:0}100%{transform:rotate(-12deg);opacity:1}}
+.bTab{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.bTab th{background:#0A0A0A;color:#EDEDE8;text-align:left;padding:9px 8px;font-weight:500}
+.bTab td{padding:10px 8px;border-bottom:1px solid #0A0A0A}
+.bTab tr:hover td{background:#FF5B00;cursor:pointer}
+.st2{display:inline-block;border:1.5px solid #0A0A0A;padding:2px 6px;font-size:11px}
+body.c-card .chip{border-radius:0;border:1.5px solid #0A0A0A;background:transparent}
+body.c-card .chip.on{background:#0A0A0A}
+body.c-card .card .cov{border:2px solid #0A0A0A;border-radius:0}
+body.c-card .card:hover .cov{transform:translate(-4px,-4px);box-shadow:6px 6px 0 #FF5B00}
+body.c-card .spread{border:2px solid #0A0A0A;border-radius:0;box-shadow:8px 8px 0 #FF5B00}
+
+/* ===== 10 · PASTEL CLOUD ===== */
+.pas{position:relative;padding:6px 36px 30px;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.6;animation:blobF 12s ease-in-out infinite alternate}
+.b1{width:340px;height:340px;background:#FFD9D0;left:-60px;top:40px}.b2{width:300px;height:300px;background:#D6E8FF;right:80px;top:-40px;animation-delay:-4s}.b3{width:280px;height:280px;background:#DDF5E8;right:-40px;bottom:-60px;animation-delay:-8s}
+@keyframes blobF{to{transform:translate(40px,30px) scale(1.12)}}
+.pasH{font-family:var(--fd);font-size:42px;font-weight:800;margin:6px 0 4px}
+.hello p{color:var(--muted);margin:0 0 18px;font-size:15px}
+.stories{display:flex;gap:18px;margin-bottom:22px}
+.story{width:138px;cursor:pointer;text-align:center}
+.story .sIn{height:196px;border-radius:24px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px var(--c),0 12px 24px rgba(43,42,61,.12);transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.story:hover .sIn{transform:translateY(-8px) rotate(-2deg)}
+.story .sIn>svg{width:100%;height:100%;display:block}
+.story small{display:block;margin-top:9px;font-size:13px;font-weight:800}
+.story em{display:block;font-style:normal;font-size:11px;color:var(--muted)}
+.pasRow{display:grid;grid-template-columns:1.45fr 1fr;gap:18px}
+.pasBig{display:grid;grid-template-columns:150px 1fr;gap:22px;background:#fff;border-radius:28px;padding:20px;box-shadow:0 20px 40px rgba(43,42,61,.08);cursor:pointer}
+.pasBig .cov{border-radius:18px}
+.pasBig h3{font-size:36px;margin:10px 0 2px;font-weight:800}
+.pasBig p{color:var(--muted);margin:0 0 12px}
+.bounce{margin-top:18px;animation:bnc 2.2s cubic-bezier(.3,1.6,.5,1) infinite}
+@keyframes bnc{0%,78%,100%{transform:none}86%{transform:translateY(-7px)}}
+.pasSide{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bub{border-radius:24px;padding:18px;font-size:13px;color:#2B2A3D;transition:transform .35s cubic-bezier(.3,1.6,.5,1);cursor:pointer}
+.bub:hover{transform:scale(1.05) rotate(-1.5deg)}
+.bub b{display:block;font-size:30px;font-weight:800;line-height:1.1}
+body.c-pastel .btn{border-radius:999px}
+body.c-pastel .card .cov{border-radius:18px}
+body.c-pastel .card:hover .cov{transform:translateY(-8px) rotate(-2deg);box-shadow:0 18px 30px rgba(43,42,61,.16);transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+body.c-pastel .spread{border:0;background:#fff;border-radius:28px;box-shadow:0 30px 60px rgba(43,42,61,.15)}
+body.c-pastel .rb{background:#fff;border-color:transparent;border-radius:999px}
+
+/* ===== 11 · MECHA HUD ===== */
+.hud{position:relative;padding:4px 36px 24px}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(143,163,173,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(143,163,173,.07) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.hCols{position:relative;display:grid;grid-template-columns:1fr 430px 1fr;gap:24px;align-items:center}
+.hPanel{border:1px solid rgba(255,138,0,.45);padding:16px 18px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));background:rgba(15,21,27,.85);animation:in .6s var(--ease) both}
+.hT{font-size:12px;letter-spacing:3px;color:#FF8A00;font-weight:600;display:flex;justify-content:space-between}
+.hL{font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:12px}
+.hV{font-size:16px;font-weight:600}.hV.o{color:#FF8A00}.hV.b{color:#5FD4FF}
+.hCenter{position:relative;height:430px;display:grid;place-items:center}
+.dial{position:absolute;inset:0;width:100%;height:100%}
+.dial .r1{transform-origin:215px 215px;animation:spin 40s linear infinite}
+.dial .r2{transform-origin:215px 215px;animation:spin 16s linear infinite reverse}
+.dial .pa{stroke-dasharray:0 1100;animation:arcD 1.6s var(--ease) .3s forwards}
+@keyframes arcD{to{stroke-dasharray:744 1100}}
+.brk{position:relative;width:168px;cursor:pointer}
+.brks{position:absolute;inset:-14px;animation:lock .9s var(--ease) .2s both}
+@keyframes lock{from{transform:scale(1.5) rotate(8deg);opacity:0}}
+.brks span{position:absolute;width:22px;height:22px;border:2px solid #FF8A00}
+.brks .a{left:0;top:0;border-right:0;border-bottom:0}.brks .b{right:0;top:0;border-left:0;border-bottom:0}.brks .c{left:0;bottom:0;border-right:0;border-top:0}.brks .d{right:0;bottom:0;border-left:0;border-top:0}
+.sweep{position:absolute;left:-14px;right:-14px;height:2px;background:#5FD4FF;box-shadow:0 0 14px #5FD4FF;opacity:.75;animation:sweep 3s ease-in-out infinite}
+@keyframes sweep{0%,100%{top:4%}50%{top:96%}}
+.hPct{position:absolute;bottom:18px;font-size:13px;letter-spacing:3px;color:#FF8A00}
+.hq{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding .2s}
+.hq:hover{padding-left:8px;color:#FF8A00}
+.hq .cov{width:40px;border-radius:0}
+.hq small{color:var(--muted);font-size:11px;display:block}
+.hBot{position:relative;margin-top:16px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;border-top:1px solid rgba(255,138,0,.45);padding-top:14px}
+.spark polyline{stroke-dasharray:1400;stroke-dashoffset:1400;animation:spk 2s var(--ease) .5s forwards}
+@keyframes spk{to{stroke-dashoffset:0}}
+body.c-hud .btn{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));letter-spacing:1px;text-transform:uppercase}
+body.c-hud .card .cov{border-radius:0}
+body.c-hud .card:hover .cov{outline:1px solid #FF8A00;outline-offset:6px}
+body.c-hud .spread{border:1px solid rgba(255,138,0,.6);border-radius:0;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px))}
+body.c-hud .rd::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(143,163,173,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(143,163,173,.06) 1px,transparent 1px);background-size:40px 40px}
+
+
+/* ===== 12 · INK ARCHIVE (2 + 9 + 4) ===== */
+body.c-ink .btn{border-radius:0}
+body.c-ink .btn:hover{box-shadow:5px 5px 0 var(--acc)}
+body.c-ink .btn.acc:hover{box-shadow:5px 5px 0 var(--ink)}
+body.c-ink .nav .links button{border-radius:0}
+body.c-ink .nav .links button.cur{background:var(--ink);color:var(--onInk)}
+body.c-ink .search{border:2px solid var(--ink);background:transparent;border-radius:0}
+body.c-ink .logo .mk{border-radius:0}
+.inkTop{display:grid;grid-template-columns:1fr 1.3fr;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);margin:4px 36px 16px}
+.inkL{padding:20px 26px 22px 0;border-right:3px solid var(--ink);position:relative;overflow:hidden}
+.inkNo{font-family:'Anton',sans-serif;font-size:146px;line-height:.95;letter-spacing:-1px}
+.inkNo span{color:var(--acc)}
+.inkT{font-family:'Anton',sans-serif;font-size:58px;font-weight:400;margin:2px 0 8px;line-height:1;text-transform:uppercase}
+.inkL.swap .inkNo,.inkL.swap .inkT,.inkL.swap .segbar{animation:slamT .45s cubic-bezier(.3,1.3,.5,1) both}
+.inkL.swap .inkT{animation-delay:.05s}.inkL.swap .segbar{animation-delay:.1s}
+@keyframes slamT{from{transform:translateY(-16px) skewX(-8deg);opacity:0}}
+.segbar{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;margin:16px 0 6px;max-width:440px}
+.segbar i{height:12px;background:color-mix(in srgb,var(--ink) 14%,transparent)}.segbar i.on{background:var(--ink)}
+.segbar i.on:last-of-type{background:var(--acc)}
+.inkR{position:relative;overflow:hidden;background:var(--panel2)}
+.inkR .burst{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg at 50% 50%,var(--ink) 0 1deg,transparent 1deg 8deg);opacity:.09;animation:spin 80s linear infinite}
+.inkR .dots{position:absolute;inset:0;background-image:radial-gradient(var(--ink) 1.1px,transparent 1.4px);background-size:7px 7px;opacity:.09}
+.inkR .flow{height:400px;margin:0}
+.inkR .fc{width:184px}
+body.c-ink .fc .cov{border:3px solid var(--ink);border-radius:0;box-shadow:none}
+body.c-ink .fc.c0 .cov{box-shadow:10px 10px 0 var(--acc)}
+.inkR .tagA{position:absolute;left:18px;top:16px;z-index:20;background:var(--ink);color:var(--onInk);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;padding:6px 10px}
+.inkR .bubble2{position:absolute;right:26px;top:22px;z-index:20;background:var(--panel2);border:3px solid var(--ink);border-radius:50%;padding:14px 18px;font-family:'Anton',sans-serif;font-size:16px;text-transform:uppercase;animation:pop .5s cubic-bezier(.3,1.6,.5,1) .6s both}
+.flowNav{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:12px;align-items:center;z-index:20}
+.flowNav button{width:44px;height:44px;border:2px solid var(--ink);background:var(--onInk);font-size:13px;border-radius:0}
+.flowNav button:hover{background:var(--ink);color:var(--onInk)}
+.flowNav span{background:var(--onInk);border:2px solid var(--ink);padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.inkMid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:0 36px 18px}
+.ip{position:relative;border:3px solid var(--ink);background:var(--panel);padding:16px;min-height:262px;overflow:hidden;opacity:0;animation:slam .5s cubic-bezier(.3,1.3,.5,1) forwards}
+.ip:nth-child(1){clip-path:polygon(0 0,100% 0,97% 100%,0 100%)}
+.ip:nth-child(2){animation-delay:.1s}
+.ip:nth-child(3){animation-delay:.2s;clip-path:polygon(3% 0,100% 0,100% 100%,0 100%);background:var(--ink);color:var(--onInk);cursor:pointer}
+.ip h4{font-family:'Anton',sans-serif;font-size:22px;font-weight:400;text-transform:uppercase;margin:0 0 12px;position:relative;letter-spacing:.5px}
+.ip .lcards{width:auto;height:190px;margin:0 6px}
+.ip .lc table{font-size:11px}.ip .lc td{padding:5px 2px}
+body.c-ink .lc.c3{background:var(--acc)}
+body.c-ink .stampB{color:var(--acc);border-color:var(--acc);font-family:'Anton',sans-serif;font-weight:400;font-size:20px}
+.ip .upn{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ip .upn .cov{border:2px solid var(--ink);transition:transform .2s var(--ease),box-shadow .2s}
+.ip .upn div:hover .cov{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--acc)}
+.ip .upn small{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;margin-top:5px}
+.ip .burstW{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg at 50% 50%,var(--onInk) 0 1deg,transparent 1deg 8deg);opacity:.12;animation:spin 60s linear infinite}
+.ip .big{font-family:'Anton',sans-serif;font-size:46px;line-height:.95;text-transform:uppercase;position:relative}
+.ip .big span{color:var(--acc)}
+body.c-ink .bTab th{background:var(--ink);color:var(--onInk)}
+body.c-ink .bTab td{border-bottom-color:color-mix(in srgb,var(--ink) 40%,transparent)}
+body.c-ink .bTab tr:hover td{background:var(--acc);color:#fff}
+.ink-st{display:inline-block;border:1.5px solid var(--ink);padding:2px 6px;font-size:11px}
+.ink-st.out{background:var(--acc);color:#fff;border-color:var(--acc)}
+/* other screens */
+body.c-ink .h2{font-weight:400;text-transform:uppercase;font-size:58px}
+body.c-ink .chip{border-radius:0;border:2px solid var(--ink);background:transparent}
+body.c-ink .chip.on{background:var(--ink);color:var(--onInk)}
+body.c-ink .seg{border-radius:0;border:2px solid var(--ink);background:transparent}
+body.c-ink .seg button{border-radius:0}
+body.c-ink .card .cov{border:3px solid var(--ink);border-radius:0}
+body.c-ink .card:hover .cov{transform:translate(-4px,-4px);box-shadow:8px 8px 0 var(--acc)}
+body.c-ink .card .t{font-family:'Anton',sans-serif;font-weight:400;font-size:17px;text-transform:uppercase;letter-spacing:.3px}
+body.c-ink .card .s{font-family:'IBM Plex Mono',monospace;font-size:11px}
+body.c-ink .list .card{border-bottom:1px solid var(--ink);border-radius:0}
+body.c-ink .list .card:hover{background:var(--acc);color:#fff}
+body.c-ink .list .card:hover .x,body.c-ink .list .card:hover .s{color:#fff}
+body.c-ink .vHead>.cov{border:3px solid var(--ink);box-shadow:10px 10px 0 var(--acc)!important}
+body.c-ink .stats b{font-weight:400;font-size:30px}
+body.c-ink .stats{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:10px 0}
+body.c-ink .vol .cov{border:2px solid var(--ink);border-radius:0}
+body.c-ink .vol:hover .cov{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--acc)}
+body.c-ink .vol .m b{font-family:'IBM Plex Mono',monospace;font-size:11px}
+body.c-ink .ftable{font-family:'IBM Plex Mono',monospace}
+body.c-ink .ftable th{background:var(--ink);color:var(--onInk)}
+body.c-ink .ftable td{border-bottom:1px solid var(--ink)}
+body.c-ink .rd::before{content:"";position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg at 50% 50%,color-mix(in srgb,var(--rtext) 6%,transparent) 0 1.2deg,transparent 1.2deg 7deg);animation:spin 140s linear infinite}
+body.c-ink .spread{border-width:4px;border-radius:0;box-shadow:10px 10px 0 var(--acc)}
+body.c-ink .rTop .ttl b{font-weight:400;font-size:26px;text-transform:uppercase}
+body.c-ink .rTop .ttl span{font-family:'IBM Plex Mono',monospace}
+body.c-ink .rb{border-radius:0;border:2px solid var(--ink)}
+body.c-ink .scrub{font-family:'IBM Plex Mono',monospace}
+body.c-ink .drop{border-radius:0}
+body.c-ink .drop svg.border rect{stroke-width:3}
+body.c-ink .qi{border:2px solid var(--ink);border-radius:0}
+body.c-ink .qi .prog{border-radius:0}
+body.c-ink .opt{border-radius:0;border:2px solid var(--ink)}
+body.c-ink .opt[aria-pressed="true"]{box-shadow:5px 5px 0 var(--acc)}
+body.c-ink .rule{border-radius:0;border:2px solid var(--ink);background:transparent}
+.accTog{display:none;gap:8px;align-items:center;font-size:13px;color:#9AA0A8;margin:0 0 12px}
+.accTog button{border:1.5px solid #252A30;background:#14171B;border-radius:8px;padding:8px 12px;min-height:40px;display:flex;align-items:center;gap:8px;color:#E6E3DC}
+.accTog button i{width:14px;height:14px;display:block}
+.accTog button[aria-pressed="true"]{border-color:#F2C230}
+
+</style>
+</head>
+<body class="c-ink">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="3" seed="3"/><feDisplacementMap in="SourceGraphic" scale="10"/></filter></svg>
+<div class="shell">
+  <div class="head">
+    <h1>KOMA · Concept 12 — Ink Archive</h1>
+    <p>Your three picks merged into one direction. Concepts 2, 9 and 4 stay in the picker so you can compare them with the merge. Every concept follows the same model: you import CBZ files, each file is a volume, and volumes are grouped into series. Fully offline. Pick a concept, then step through its screens.</p>
+  </div>
+  <div class="picker" id="picker"></div>
+  <div class="accTog" id="accTog" role="group" aria-label="Theme and accent">Theme <button data-dark="0" aria-pressed="true"><i style="background:#F1EEE6;border:1px solid #555"></i>Light paper</button><button data-dark="1" aria-pressed="false"><i style="background:#121110;border:1px solid #555"></i>Dark ink</button><span style="width:14px"></span>Accent <button data-acc="#E3242B" aria-pressed="true"><i style="background:#E3242B"></i>Screentone red</button><button data-acc="#FF5B00" aria-pressed="false"><i style="background:#FF5B00"></i>Archive orange</button></div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="win">
+    <div class="tbar"><span id="tbt">KOMA</span><div class="wc" aria-hidden="true"><i>&#8212;</i><i>&#9633;</i><i>&#10005;</i></div></div>
+    <div id="app"></div>
+  </div>
+  <p class="cap" id="cap"></p>
+</div>
+<script>
+const CON=[
+ {id:"tone",n:"Concept 2",name:"Screentone",tag:"Manga-magazine pages: black ink, halftone, one red. Home is laid out as a page of panels.",sw:["#F4F1EA","#111111","#E3242B","#9A968E"]},
+ {id:"ukiyo",n:"Concept 3",name:"Ukiyo Shelf",tag:"Woodblock indigo and persimmon on washi. Your volumes stand on a real bookshelf.",sw:["#EFE6D2","#1E3557","#CF5B32","#6B7F4E"]},
+ {id:"neon",n:"Concept 4",name:"Neon Seoul",tag:"Night mode built for manhwa: glass panels, coral and mint, a 3D cover carousel.",sw:["#0E0D16","#1A1827","#FF7A66","#6FE3C1"]},
+ {id:"zen",n:"Concept 5",name:"Sumi Zen",tag:"Quiet and minimal: lots of white space, one red dot, an ensō brush ring for progress.",sw:["#FAFAF7","#1A1A1A","#C8372A","#D9D8D2"]},
+ {id:"riso",n:"Concept 6",name:"Riso Zine",tag:"Risograph-print fun: pink, blue and yellow ink, stickers, a bento grid and a ticker.",sw:["#F6F1E6","#FF48B0","#0078BF","#FFE800"]},
+ {id:"emaki",n:"Concept 7",name:"Moon Emaki",tag:"Plum night, gold leaf and falling sakura. Your reading history drifts past like a picture scroll.",sw:["#1E1626","#C9A45C","#E8B4BC","#2A2033"]},
+ {id:"arcade",n:"Concept 8",name:"Shōnen Arcade",tag:"Retro game screen: CONTINUE?, save slots, health-bar progress and achievements.",sw:["#0F1B2E","#FF3366","#33E1FF","#FFD23F"]},
+ {id:"card",n:"Concept 9",name:"Archive Card",tag:"Brutalist library catalog: giant numbers, hard grid lines, a stamped reading card.",sw:["#EDEDE8","#0A0A0A","#FF5B00","#D6D6CF"]},
+ {id:"pastel",n:"Concept 10",name:"Pastel Cloud",tag:"Soft and bouncy for manhwa: story-style new-chapter cards and floating color blobs.",sw:["#F5F2FF","#FF9E8A","#7FB8FF","#DDF5E8"]},
+ {id:"hud",n:"Concept 11",name:"Mecha HUD",tag:"Cockpit display: target brackets, a progress dial, live file readouts.",sw:["#0A0E11","#FF8A00","#5FD4FF","#8FA3AD"]},
+ {id:"ink",n:"Concept 12 · merged",name:"Ink Archive",tag:"2 + 9 + 4: screentone ink, archive catalog type and the rotating cover carousel on Home.",sw:["#F1EEE6","#0E0E0E","#E3242B","#FF5B00"]}
+];
+CON.splice(0,CON.length,...CON.filter(c=>["ink","tone","card","neon"].includes(c.id)).sort((x,y)=>["ink","tone","card","neon"].indexOf(x.id)-["ink","tone","card","neon"].indexOf(y.id)));
+const SCR=[["home","Home"],["library","Library"],["volume","Series & volumes"],["reader","Reader"],["import","Import CBZ"]];
+const SER=[
+ {t:"Paper Ronin",j:"ペーパーローニン",g:"Seinen · Historical",ty:"Manga",v:14,r:6,cur:7,p:142,of:208,sz:"18.6 GB"},
+ {t:"Tidebreaker",j:"タイドブレイカー",g:"Action · Fantasy",ty:"Manhwa",v:9,r:4,cur:5,p:61,of:74,sz:"11.2 GB"},
+ {t:"Ashen Tide",j:"アッシェンタイド",g:"Shounen · Action",ty:"Manga",v:22,r:11,cur:12,p:18,of:196,sz:"24.1 GB"},
+ {t:"Hollow Bloom",j:"ホロウブルーム",g:"Shoujo · Fantasy",ty:"Manga",v:9,r:9,cur:9,p:190,of:190,sz:"7.2 GB"},
+ {t:"Ember Ward",j:"エンバーワード",g:"Fantasy · Drama",ty:"Manhwa",v:6,r:2,cur:3,p:30,of:88,sz:"15.0 GB"},
+ {t:"Night Market 47",j:"ナイトマーケット",g:"Seinen · Mystery",ty:"Manga",v:4,r:1,cur:2,p:77,of:180,sz:"2.9 GB"},
+ {t:"Steel Koi",j:"スチールコイ",g:"Shounen · Sports",ty:"Manga",v:12,r:0,cur:1,p:0,of:200,sz:"9.8 GB"},
+ {t:"Moonlit Courier",j:"ムーンクーリエ",g:"Josei · Slice of life",ty:"Manga",v:5,r:5,cur:5,p:176,of:176,sz:"3.3 GB"},
+ {t:"Quiet Blade",j:"クワイエットブレード",g:"Seinen · Action",ty:"Manga",v:10,r:3,cur:4,p:12,of:192,sz:"8.2 GB"},
+ {t:"The Last Lantern",j:"ラストランタン",g:"Romance · Drama",ty:"Manhwa",v:7,r:1,cur:2,p:40,of:92,sz:"6.1 GB"},
+ {t:"Crow Season",j:"クロウシーズン",g:"Seinen · Horror",ty:"Manga",v:3,r:0,cur:1,p:0,of:186,sz:"2.2 GB"},
+ {t:"Salt & Static",j:"ソルトスタティック",g:"Sci-fi",ty:"Manga",v:8,r:8,cur:8,p:184,of:184,sz:"6.6 GB"}
+];
+const PAL={
+ tone:[["#FFFFFF","#111","#E3242B"],["#111","#F4F1EA","#E3242B"],["#E3242B","#F4F1EA","#111"],["#D9D4C8","#111","#E3242B"]],
+ ukiyo:[["#1E3557","#EFE6D2","#CF5B32"],["#EFE6D2","#1E3557","#CF5B32"],["#CF5B32","#EFE6D2","#1E3557"],["#6B7F4E","#EFE6D2","#E4D8BF"],["#E4D8BF","#1E3557","#6B7F4E"]],
+ neon:[["#221E3A","#EEEAF7","#FF7A66"],["#FF7A66","#0E0D16","#EEEAF7"],["#16302B","#6FE3C1","#A99BFF"],["#2A2147","#A99BFF","#6FE3C1"],["#3B1F2B","#FFB3A6","#FF7A66"]],
+ zen:[["#FFFFFF","#1A1A1A","#C8372A"],["#1A1A1A","#FAFAF7","#C8372A"],["#ECEBE6","#1A1A1A","#1A1A1A"],["#D9D8D2","#1A1A1A","#C8372A"]],
+ riso:[["#FF48B0","#1D1D1B","#0078BF"],["#0078BF","#F6F1E6","#FF48B0"],["#FFE800","#1D1D1B","#FF48B0"],["#F6F1E6","#0078BF","#FF48B0"]],
+ emaki:[["#2A2033","#F3E9DC","#C9A45C"],["#C9A45C","#1E1626","#E8B4BC"],["#E8B4BC","#1E1626","#C9A45C"],["#3B2A44","#E8B4BC","#C9A45C"]],
+ arcade:[["#17284A","#33E1FF","#FF3366"],["#FF3366","#0F1B2E","#FFD23F"],["#FFD23F","#0F1B2E","#33E1FF"],["#0F1B2E","#FFD23F","#FF3366"]],
+ card:[["#F7F7F3","#0A0A0A","#FF5B00"],["#0A0A0A","#EDEDE8","#FF5B00"],["#FF5B00","#0A0A0A","#EDEDE8"],["#D6D6CF","#0A0A0A","#0A0A0A"]],
+ pastel:[["#FFD9D0","#2B2A3D","#FF9E8A"],["#D6E8FF","#2B2A3D","#7FB8FF"],["#DDF5E8","#2B2A3D","#6CCB9F"],["#ECE2FF","#2B2A3D","#A98BFF"],["#FFF1C9","#2B2A3D","#FFB84D"]],
+ hud:[["#111820","#FF8A00","#5FD4FF"],["#1A1208","#FF8A00","#DCE6EB"],["#0E1A20","#5FD4FF","#FF8A00"],["#161B1F","#DCE6EB","#FF8A00"]],
+ ink:[["#FAF8F3","#0E0E0E","#E3242B"],["#0E0E0E","#F1EEE6","#E3242B"],["#E3242B","#F1EEE6","#0E0E0E"],["#D6D2C6","#0E0E0E","#E3242B"]]
+};
+let C="ink",S="home",ACC=null,DARK=false;
+
+/* ---------- art generators (all invented) ---------- */
+function cover(i,vol,uid,po){
+  const s=SER[i%SER.length],P=PAL[C][(i+(po||0))%PAL[C].length],[bg,fg,ac]=P,id=C+i+"_"+(vol||0)+(uid||"");
+  const shapes=[
+    `<circle cx="150" cy="150" r="78" fill="${ac}"/>`,
+    `<path d="M0 260 Q60 215 120 255 T240 250 T320 260 V430 H0Z" fill="${ac}"/>`,
+    `<g stroke="${ac}" stroke-width="3">${Array.from({length:16},(_,k)=>`<line x1="150" y1="190" x2="${150+Math.cos(k/16*6.28)*280}" y2="${190+Math.sin(k/16*6.28)*280}"/>`).join("")}</g><circle cx="150" cy="190" r="40" fill="${bg}"/>`,
+    `<rect x="36" y="60" width="150" height="210" fill="none" stroke="${ac}" stroke-width="8"/><rect x="110" y="120" width="150" height="190" fill="${ac}" opacity=".8"/>`,
+    `<path d="M150 40 L260 300 L40 300Z" fill="${ac}"/>`
+  ];
+  let extra="";
+  if(C==="riso") extra=`<g style="mix-blend-mode:multiply" opacity=".75" transform="translate(7 -5)">${shapes[(i+2)%5].replaceAll(ac,fg==="#1D1D1B"?"#0078BF":"#FF48B0")}</g>`;
+  if(C==="ukiyo") extra=`<g opacity=".25" fill="none" stroke="${fg}" stroke-width="2">${Array.from({length:6},(_,r)=>Array.from({length:6},(_,c)=>`<path d="M${c*60+(r%2)*30-30} ${300+r*22} a30 30 0 0 1 60 0"/>`).join("")).join("")}</g>`;
+  const titleFont={tone:"Anton",ukiyo:"Shippori Mincho",neon:"Plus Jakarta Sans",zen:"Shippori Mincho",riso:"Bricolage Grotesque",emaki:"Kaisei Opti",arcade:"DotGothic16",card:"Inter Tight",pastel:"Nunito",hud:"Chakra Petch",ink:"Anton"}[C];
+  const tsize={tone:42,ukiyo:30,neon:28,zen:24,riso:36,emaki:30,arcade:30,card:34,pastel:30,hud:30,ink:42}[C];
+  return `<svg viewBox="0 0 300 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+   <defs><pattern id="h${id}" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.3" fill="${fg}" opacity="${C==='tone'?.35:.14}"/></pattern></defs>
+   <rect width="300" height="430" fill="${bg}"/><rect width="300" height="430" fill="url(#h${id})"/>
+   ${shapes[i%5]}${extra}
+   <text x="262" y="40" font-family="Noto Sans JP" font-weight="700" font-size="34" fill="${fg}" writing-mode="tb">${s.j.slice(0,7)}</text>
+   <text x="22" y="380" font-family="${titleFont}" font-weight="800" font-size="${tsize}" fill="${fg}">${s.t.toUpperCase().slice(0,13)}</text>
+   ${vol?`<rect x="216" y="356" width="64" height="58" rx="${C==='neon'?14:C==='tone'?0:6}" fill="${fg}"/><text x="248" y="398" text-anchor="middle" font-family="${titleFont}" font-weight="800" font-size="30" fill="${bg}">${String(vol).padStart(2,"0")}</text>`:""}
+   <text x="22" y="412" font-family="JetBrains Mono" font-size="11" fill="${fg}" opacity=".7">${s.ty.toUpperCase()}${vol?" · VOL "+vol:""}</text>
+  </svg>`;
+}
+function pageArt(seed){
+  const r=n=>((Math.sin(seed*99+n*7.3)+1)/2);
+  const lines=Array.from({length:30},(_,k)=>`<line x1="150" y1="120" x2="${150+Math.cos(k/30*6.28)*300}" y2="${120+Math.sin(k/30*6.28)*300}" stroke="#111" stroke-width="${.6+r(k)*1.6}"/>`).join("");
+  const a=120+r(2)*40;
+  return `<svg viewBox="0 0 300 426" aria-hidden="true"><defs><pattern id="pt${seed}" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1" fill="#111" opacity=".55"/></pattern><clipPath id="cp${seed}"><rect x="14" y="14" width="272" height="200"/></clipPath></defs>
+   <rect width="300" height="426" fill="#F4F1EA"/><g transform="${seed%2?"":"translate(300 0) scale(-1 1)"}"><g clip-path="url(#cp${seed})"><rect x="14" y="14" width="272" height="200" fill="#fff"/>${lines}<circle cx="150" cy="120" r="${30+r(1)*20}" fill="#F4F1EA"/></g>
+   <rect x="14" y="14" width="272" height="200" fill="none" stroke="#111" stroke-width="3"/>
+   <path d="M14 226 H${a} L${a-10} 412 H14Z" fill="url(#pt${seed})" stroke="#111" stroke-width="3"/>
+   <path d="M${a+12} 226 H286 V412 H${a+2}Z" fill="#fff" stroke="#111" stroke-width="3"/>
+   <path d="M${a+30} 330 Q200 260 270 330" fill="none" stroke="#111" stroke-width="2"/>
+   <ellipse cx="${210+r(4)*20}" cy="276" rx="48" ry="30" fill="#fff" stroke="#111" stroke-width="2"/>
+   <g stroke="#111" stroke-width="3" opacity=".7"><line x1="190" y1="266" x2="232" y2="266"/><line x1="192" y1="280" x2="226" y2="280"/></g>
+   <ellipse cx="70" cy="${50+r(5)*20}" rx="36" ry="22" fill="#fff" stroke="#111" stroke-width="2"/></g></svg>`;
+}
+function stripArt(n,cols){
+  let y=0,o="";
+  for(let k=0;k<n;k++){const h=300+(k%3)*110,c=cols[k%cols.length];
+    o+=`<rect y="${y}" width="440" height="${h}" fill="${c}"/><g opacity=".16" stroke="${k%2?'#000':'#fff'}">${Array.from({length:16},(_,j)=>`<line x1="${j*30}" y1="${y}" x2="${j*30+80}" y2="${y+h}"/>`).join("")}</g><circle cx="${120+(k*73)%220}" cy="${y+h/2}" r="${40+(k%4)*18}" fill="${k%2?'#111':'#fff'}" opacity=".5"/>`;
+    if(k%2==0)o+=`<ellipse cx="${300-(k*41)%160}" cy="${y+60}" rx="70" ry="34" fill="#fff" stroke="#111" stroke-width="2"/>`;
+    y+=h}
+  const svg=`<svg viewBox="0 0 440 ${y}" style="display:block;width:100%" aria-hidden="true">${o}</svg>`;return svg+svg;
+}
+const I={
+ play:`<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4l12 8-12 8z"/></svg>`,
+ plus:`<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>`,
+ search:`<svg class="ico" style="width:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>`,
+ back:`<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>`,
+ up:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="bigi"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>`
+};
+const ring=(p,col)=>{const c=2*Math.PI*15;return `<svg class="ring" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="15" fill="none" stroke="var(--line)" stroke-width="3"/><circle cx="19" cy="19" r="15" fill="none" stroke="${col||'var(--acc)'}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 19 19)"/><text x="19" y="23" text-anchor="middle" font-size="10" fill="currentColor">${Math.round(p*100)}</text></svg>`};
+const pct=s=>Math.round(((s.cur-1)+s.p/s.of)/s.v*100);
+
+/* ---------- shared pieces ---------- */
+function nav(cur){
+  const mk={tone:"コ",ukiyo:"駒",neon:"K",zen:"・",riso:"★",emaki:"月",arcade:"P1",card:"№",pastel:"k",hud:"◢",ink:"コ"}[C];
+  return `<div class="nav"><div class="logo"><span class="mk">${mk}</span>KOMA</div>
+  <div class="links">${[["home","Home"],["library","Library"],["import","Import"]].map(([k,l])=>`<button data-go="${k}" class="${cur===k?'cur':''}">${l}</button>`).join("")}</div>
+  <div class="search">${I.search}Search series, volumes, files<span class="k">Ctrl K</span></div>
+  <button class="btn acc" data-go="import" style="padding:10px 16px">${I.plus}Add CBZ</button></div>`;
+}
+
+/* ---------- HOMES ---------- */
+const HOME={
+ tone(){const s=SER[0];return nav("home")+`
+ <div class="toneHome">
+  <div class="tp tp1"><div class="dots"></div>
+    <div class="cov" data-go="reader">${cover(0,7)}</div>
+    <div style="position:relative">
+      <div class="lbl" style="color:#E3242B">Continue · Vol. 07</div>
+      <h2 class="vert">Paper<br>Ronin</h2>
+      <p class="jp" style="font-weight:700;letter-spacing:6px;margin:6px 0 14px">ペーパーローニン</p>
+      <div class="prog" style="height:8px;background:#ddd;border-radius:0;margin-bottom:6px"><i style="width:68%;background:#111"></i></div>
+      <div class="mono" style="font-size:12px;margin-bottom:16px">PAGE 142 / 208 · VOL 7 OF 14 · 1.3 GB</div>
+      <button class="btn acc" data-go="reader" style="border-radius:0;box-shadow:5px 5px 0 #111">${I.play}Resume reading</button>
+    </div>
+    <div class="bubble" style="right:34px;bottom:34px">3 days<br>ago!</div>
+  </div>
+  <div class="tp tp2"><div class="dots" style="opacity:.08"></div><h4>Up next in this series</h4>
+    <div class="upn">${[8,9,10].map(v=>`<div data-go="volume"><div class="cov">${cover(0,v,"u",v)}</div><small>VOL. ${String(v).padStart(2,"0")} · UNREAD</small></div>`).join("")}</div></div>
+  <div class="tp tp3"><div class="lbl" style="color:#9A968E">Your library</div><div><span class="sfx" style="-webkit-text-stroke:2px #F4F1EA;color:#E3242B">1,284</span><div style="font-family:Anton;font-size:22px;text-transform:uppercase;margin-top:6px">volumes · 96 series</div></div><div class="mono" style="font-size:12px;color:#9A968E">412 GB on disk · 38 finished</div></div>
+  <div class="tp tp4" data-go="import"><div class="burst"></div>
+    <div style="position:relative;flex:1"><h4 style="font-size:34px;margin:0">Drop CBZ files here!</h4><div style="font-size:13px;margin-top:4px">Or a whole folder. Files named like "Title v03.cbz" are grouped into series automatically.</div></div>
+    <div style="position:relative;display:flex;gap:8px">${[2,4,1].map((i,k)=>`<div class="cov" style="width:64px;border:2px solid #111;transform:rotate(${(k-1)*6}deg)">${cover(i,k+3)}</div>`).join("")}</div>
+  </div>
+ </div>`},
+ ukiyo(){const shelves=[[0,1,2,3,4],[5,6,7,8,9,10,11]];return nav("home")+`
+ <div class="ukHero in">
+  <div class="sun"></div>
+  <svg class="waves" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
+   <defs><pattern id="sg" width="60" height="30" patternUnits="userSpaceOnUse"><path d="M0 30 a30 30 0 0 1 60 0 M10 30 a20 20 0 0 1 40 0 M20 30 a10 10 0 0 1 20 0" fill="none" stroke="#EFE6D2" stroke-width="2" opacity=".5"/></pattern></defs>
+   <g class="w1"><path d="M-60 80 Q80 20 220 80 T500 80 T780 80 T1060 80 T1340 80 V200 H-60Z" fill="#2B4A75"/></g>
+   <g class="w2"><path d="M-60 120 Q100 70 260 120 T580 120 T900 120 T1260 120 V200 H-60Z" fill="url(#sg)"/><path d="M-60 120 Q100 70 260 120 T580 120 T900 120 T1260 120" fill="none" stroke="#EFE6D2" stroke-width="3"/></g>
+  </svg>
+  <div style="position:relative;z-index:2">
+   <div class="lbl" style="color:#E4D8BF;opacity:.8">続きを読む · Continue reading</div>
+   <h2>Paper Ronin</h2>
+   <div style="font-size:14px;margin:10px 0 18px;opacity:.85">Volume 7 · page 142 of 208 · three volumes waiting after this one</div>
+   <div style="display:flex;gap:10px;align-items:center"><button class="btn" data-go="reader" style="background:#CF5B32;color:#fff">${I.play}Resume</button><button class="btn" data-go="volume" style="background:transparent;box-shadow:inset 0 0 0 1.5px #EFE6D2;color:#EFE6D2">All 14 volumes</button>
+   <div style="width:160px;margin-left:10px"><div class="prog" style="background:rgba(239,230,210,.2)"><i style="width:68%"></i></div></div></div>
+  </div>
+  <div class="vt">浪人の紙</div>
+  <div class="cov" data-go="reader">${cover(0,7)}</div>
+ </div>
+ ${shelves.map((sh,n)=>`<div class="shelfLbl"><h3>${n?"Recently imported":"Reading now"}</h3><span class="lbl">${n?"7 series":"5 series"}</span></div>
+ <div class="shelf"><div class="bk st">${sh.flatMap(i=>Array.from({length:Math.min(SER[i].v,n?4:5)},(_,v)=>{const P=PAL.ukiyo[(i+v)%5];const h=150+((i*7+v*13)%40);return `<div class="spine" data-go="volume" style="height:${h}px;background:${P[0]};color:${P[1]}">${SER[i].t}<span class="vn">${v+1}</span></div>`})).join("")}</div><div class="board"></div></div>`).join("")}
+ <div style="height:30px"></div>`},
+ neon(){return nav("home")+`
+ <div class="neHome">
+  <div class="flow" id="flow"><div class="glow"></div>${[0,1,4,2,9].map((i,k)=>`<div class="fc" data-i="${i}">${`<div class="cov" data-go="reader">${cover(i,SER[i].cur)}</div>`}<div class="lab"><b style="font-size:18px">${SER[i].t}</b><div style="font-size:12px;color:var(--muted)">Vol. ${SER[i].cur} · p.${SER[i].p}/${SER[i].of} · ${SER[i].ty}</div></div></div>`).join("")}</div>
+  <div class="neRow">
+   <div class="glass cont"><div style="display:flex;justify-content:space-between;align-items:center;padding:0 8px 6px"><b>Continue reading</b><span style="font-size:12px;color:var(--muted)">5 in progress</span></div>
+    ${[0,1,4,2,9].slice(0,4).map(i=>{const s=SER[i];return `<div class="ci" data-go="reader"><div class="cov">${cover(i,s.cur)}</div><div><b>${s.t}</b><br><small>Vol. ${s.cur} · ${s.ty} · ${s.sz}</small></div>${ring(s.p/s.of,i%2?'#6FE3C1':'#FF7A66')}</div>`}).join("")}</div>
+   <div class="glass"><div style="display:flex;justify-content:space-between;padding:16px 16px 0"><b>Long-strip manhwa</b><span style="font-size:12px;color:var(--muted)">auto-preview</span></div>
+    <div class="strips">${[1,4,9].map((i,k)=>`<div class="sp" data-go="reader"><div class="strip">${stripArt(5,[["#221E3A","#FF7A66","#16302B","#A99BFF"],["#3B1F2B","#6FE3C1","#2A2147","#FFB3A6"],["#16302B","#EEEAF7","#FF7A66","#221E3A"]][k])}</div><b>${SER[i].t}</b></div>`).join("")}</div></div>
+  </div>
+ </div>`},
+ zen(){const s=SER[0];return nav("home")+`
+ <div class="zen">
+  <div class="enso"><svg viewBox="0 0 380 380" aria-hidden="true"><circle class="brush" cx="190" cy="190" r="168" transform="rotate(-100 190 190)"/></svg><div class="cov" data-go="reader">${cover(0,7)}</div></div>
+  <div class="in">
+   <div class="lbl">Continue</div>
+   <h2>Paper Ronin<span class="dot"></span></h2>
+   <p class="jp" style="color:var(--muted);letter-spacing:6px;margin:8px 0 26px">ペーパーローニン</p>
+   <div style="display:grid;grid-template-columns:repeat(3,auto);gap:30px;justify-content:start;margin-bottom:28px">
+    <div><div class="lbl">Volume</div><div style="font-family:var(--fd);font-size:30px">7<span style="color:var(--muted);font-size:16px"> / 14</span></div></div>
+    <div><div class="lbl">Page</div><div style="font-family:var(--fd);font-size:30px">142<span style="color:var(--muted);font-size:16px"> / 208</span></div></div>
+    <div><div class="lbl">Series</div><div style="font-family:var(--fd);font-size:30px">${pct(s)}%</div></div>
+   </div>
+   <button class="btn" data-go="reader">Resume reading</button> <button class="btn out" data-go="library" style="margin-left:6px">Library</button>
+  </div>
+ </div>
+ <div class="zl st">${[1,2,4,5,9].map((i,k)=>{const s=SER[i];return `<div class="zrow" data-go="volume"><span class="n">0${k+1}</span><span><b style="font-weight:500">${s.t}</b> <small class="jp">${s.j}</small></span><small>Vol. ${s.cur} of ${s.v}</small><div class="prog" style="height:2px"><i style="width:${s.p/s.of*100}%"></i></div><small style="text-align:right">${s.ty}</small></div>`}).join("")}</div>
+ <div style="height:30px"></div>`},
+ riso(){return nav("home")+`
+ <div class="marq"><div>${("★ NOW READING: PAPER RONIN VOL.07 ★ 3 NEW VOLUMES IMPORTED ★ 1,284 VOLUMES · 412 GB ★ TIDEBREAKER CH.58 WAITING ★ DROP CBZ ANYWHERE TO IMPORT ").repeat(4)}</div></div>
+ <div class="bento">
+  <div class="bx b1"><h4>Continue · Vol. 07</h4><div class="big">PAPER<br>RONIN</div>
+   <div class="mono" style="font-family:'Space Mono';font-size:12px">p.142 / 208 — 68%</div>
+   <div class="prog" style="height:10px;border:2px solid #1D1D1B;background:#F6F1E6;margin:8px 0 14px;width:60%"><i style="width:68%;background:#0078BF"></i></div>
+   <div><button class="btn" data-go="reader" style="border-radius:999px">${I.play}Keep reading</button></div>
+   <div class="art"><div class="duo" data-go="reader"><div class="cov">${cover(0,7)}</div></div><div class="sticker" style="right:150px;bottom:150px">3 days ago!</div></div>
+  </div>
+  <div class="bx b2" style="animation-delay:.08s"><h4>Library</h4><div class="num" style="margin-top:20px">1,284</div><div style="font-weight:600">volumes in 96 series</div><div style="font-family:'Space Mono';font-size:12px;margin-top:20px;opacity:.85">412 GB · 38 finished · 21 unread</div></div>
+  <div class="bx b3" data-go="import" style="animation-delay:.14s;cursor:pointer"><h4>Import</h4><div style="font-size:30px;font-weight:800;line-height:1;margin-top:18px">Drop CBZ<br>files here ↓</div><div style="font-size:13px;margin-top:10px">Volumes group themselves by file name.</div><div class="sticker" style="right:14px;top:14px;background:#FF48B0">NEW +3</div></div>
+  <div class="bx b4" style="animation-delay:.2s"><div><h4>Just imported</h4><div style="font-size:13px;margin-top:6px;max-width:160px">Ashen Tide 12–13, Ember Ward 04</div></div>${[2,2,4,1,6].map((i,k)=>`<div class="cov" data-go="volume">${cover(i,[12,13,4,6,1][k])}</div>`).join("")}</div>
+ </div>`},
+ emaki(){return nav("home")+`
+ <div class="emHero">
+  <div class="petals">${Array.from({length:16},(_,k)=>`<i style="left:${(k*67)%100}%;animation-delay:${(k*.7)%6}s;animation-duration:${7+(k%4)}s"></i>`).join("")}</div>
+  <div class="in" style="position:relative;z-index:2">
+   <div class="lbl" style="color:#C9A45C">今宵の一巻 · Tonight's volume</div>
+   <h2 class="emT">Paper Ronin</h2>
+   <p style="color:var(--muted);margin:10px 0 24px;font-size:15px">Volume 7 · page 142 of 208 · 38 pages read last night</p>
+   <div style="display:flex;gap:10px"><button class="btn acc" data-go="reader">${I.play}Continue the scroll</button><button class="btn out" data-go="volume" style="box-shadow:inset 0 0 0 1.5px #C9A45C;color:#C9A45C">All 14 volumes</button></div>
+  </div>
+  <div class="emArt"><div class="moon"></div><div class="emFrame" data-go="reader">${cover(0,7)}</div></div>
+ </div>
+ <div class="pad" style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><b style="font-family:var(--fd);font-size:22px">Your reading scroll</b><span class="lbl">Drifts on its own · hover to pause</span></div>
+ <div class="emScroll"><div class="emTrack">
+  <svg class="cloud" viewBox="0 0 2400 220" preserveAspectRatio="none" aria-hidden="true"><path d="M0 110 C200 40 400 180 600 110 S1000 40 1200 110 S1600 180 1800 110 S2200 40 2400 110" fill="none" stroke="#C9A45C" stroke-width="2" stroke-dasharray="6 8"/><path d="M0 200 Q120 160 240 190 T480 185 T720 195 T960 180 T1200 195 T1440 185 T1680 195 T1920 180 T2160 195 T2400 185 V220 H0Z" fill="#C9A45C" opacity=".14"/></svg>
+  ${[[0,7,"Tonight"],[1,5,"Nov 9"],[4,3,"Nov 8"],[2,12,"Nov 6"],[9,2,"Nov 4"],[5,2,"Nov 2"],[3,9,"Oct 30"],[7,5,"Oct 27"],[0,6,"Oct 25"],[11,8,"Oct 21"]].map(([i,v,d],k)=>`<div class="emCard" style="left:${60+k*230}px;top:${k%2?120:20}px" data-go="volume"><div class="cov">${cover(i,v,"e"+k)}</div><div><b>${SER[i].t}</b><small>Vol. ${v} · ${d}</small></div></div>`).join("")}
+ </div></div>`},
+ arcade(){return nav("home")+`
+ <div class="arc">
+  <div class="arcTop">
+   <div><div class="px" style="color:#FFD23F">PLAYER 1 · PAPER RONIN VOL 07</div><h2 class="arcT">CONTINUE?</h2><div class="cd">9</div></div>
+   <div class="xp"><div class="px">LV 27 READER</div><div class="xpbar"><i></i></div><div class="px" style="font-size:8px;color:var(--muted)">18,442 / 20,000 PAGES TO LV 28</div></div>
+  </div>
+  <div class="slots">${[0,1,4].map((i,k)=>{const s=SER[i];const seg=Math.round(s.p/s.of*10);return `<div class="slot ${k?'':'sel'}" data-go="reader"><div class="px" style="color:${k?'var(--muted)':'#FFD23F'}">${k?'&nbsp;&nbsp;':'&#9654; '}SLOT ${k+1}</div><div style="display:flex;gap:12px;margin-top:10px"><div class="cov">${cover(i,s.cur,"a"+k)}</div><div style="flex:1;min-width:0"><b>${s.t.toUpperCase()}</b><div class="px" style="font-size:8px;margin:6px 0;color:var(--muted)">VOL ${s.cur} · P.${s.p}/${s.of}</div><div class="px" style="font-size:8px">${s.ty.toUpperCase()}</div><div class="hp">${Array.from({length:10},(_,n)=>`<i class="${n<seg?'on':''}" style="animation-delay:${n*.08}s"></i>`).join("")}</div></div></div></div>`}).join("")}
+   <div class="slot new" data-go="import"><div class="px">&nbsp;&nbsp;SLOT 4</div><div class="plus">+</div><div><b>NEW GAME</b><div class="px" style="font-size:8px;color:var(--muted)">IMPORT CBZ FILES</div></div></div>
+  </div>
+  <div style="margin-top:26px"><div class="px" style="color:#33E1FF;margin-bottom:12px">ACHIEVEMENTS UNLOCKED</div>
+   <div class="badges">${[["&#9733;","FINISHED 38 SERIES"],["&#9790;","NIGHT OWL · 2 AM"],["&#9650;","8 GB OMNIBUS CLEARED"],["&#9670;","30-DAY STREAK"]].map(([g,t],k)=>`<div class="badge2" style="animation-delay:${.6+k*.15}s"><span>${g}</span>${t}</div>`).join("")}</div></div>
+ </div>`},
+ card(){const rows=[[0,"MANGA",14,6,"18.6 GB","OUT"],[1,"MANHWA",9,4,"11.2 GB","OUT"],[2,"MANGA",22,11,"24.1 GB","OUT"],[3,"MANGA",9,9,"7.2 GB","RETURNED"],[4,"MANHWA",6,2,"15.0 GB","OUT"],[6,"MANGA",12,0,"9.8 GB","ON SHELF"]];return nav("home")+`
+ <div class="bru">
+  <div class="bL">
+   <div class="mono2">CURRENTLY CHECKED OUT · SERIES 001 / 096</div>
+   <div class="bigNo">№<span>07</span></div>
+   <h2 class="bT">PAPER RONIN</h2>
+   <div class="mono2">ペーパーローニン / 14 VOLS / 18.6 GB / RIGHT-TO-LEFT</div>
+   <div class="prog" style="height:6px;border-radius:0;background:rgba(10,10,10,.12);margin-top:16px;max-width:420px"><i style="width:68%;background:#0A0A0A"></i></div>
+   <div class="mono2" style="margin-top:6px;color:var(--muted)">P.142 / 208 — 68%</div>
+   <div class="bRow"><button class="btn acc" data-go="reader">RESUME → P.142</button><button class="btn out" data-go="volume">OPEN SERIES</button></div>
+  </div>
+  <div class="bR"><div class="lcards"><div class="lc c3"></div><div class="lc c2"></div>
+   <div class="lc c1"><div class="lch"><b>KOMA LIBRARY · READING CARD</b><span>VOL 07</span></div>
+    <table><tbody>${[["11.11.26","p.104–142","38 pp"],["09.11.26","p.61–104","43 pp"],["06.11.26","p.1–61","61 pp"],["02.11.26","VOL 06 END","—"],["28.10.26","p.140–196","56 pp"]].map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>
+    <div class="stampB">IN PROGRESS</div></div></div></div>
+ </div>
+ <div class="pad"><table class="bTab"><thead><tr><th>ID</th><th>TITLE</th><th>TYPE</th><th>VOLS</th><th>READ</th><th>SIZE</th><th>STATUS</th></tr></thead><tbody>
+  ${rows.map(([i,t,v,r,sz,st],k)=>`<tr data-go="volume"><td>${String(k+1).padStart(3,"0")}</td><td><b>${SER[i].t.toUpperCase()}</b></td><td>${t}</td><td>${v}</td><td>${r}/${v}</td><td>${sz}</td><td><span class="st2" style="${st==='OUT'?'background:#FF5B00':''}">${st}</span></td></tr>`).join("")}
+ </tbody></table><div style="height:30px"></div></div>`},
+ pastel(){const strips=[["#FFD9D0","#7FB8FF","#DDF5E8","#ECE2FF"],["#D6E8FF","#FF9E8A","#FFF1C9","#DDF5E8"],["#DDF5E8","#A98BFF","#FFD9D0","#D6E8FF"]];return nav("home")+`
+ <div class="pas">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div style="position:relative">
+   <div class="hello in"><h2 class="pasH">Good evening, reader</h2><p>3 volumes in progress · 2 new Tidebreaker chapters imported today</p></div>
+   <div class="stories st">${[1,4,9,0,2,6].map((i,k)=>`<div class="story" data-go="reader" style="--c:${['#FF9E8A','#7FB8FF','#6CCB9F','#A98BFF','#FFB84D','#D9D4EC'][k]}"><div class="sIn">${k<3?`<div class="strip" style="animation-duration:${14+k*3}s">${stripArt(4,strips[k])}</div>`:cover(i,SER[i].cur,"p"+k)}</div><small>${SER[i].t}</small><em>${k<3?'New chapter':'Vol. '+SER[i].cur}</em></div>`).join("")}</div>
+   <div class="pasRow">
+    <div class="pasBig in" data-go="reader"><div class="cov">${cover(0,7)}</div><div><span class="chip" style="background:#FFD9D0">Continue · Vol. 7</span><h3>Paper Ronin</h3><p>Page 142 of 208 · about 25 min left in this volume</p><div class="prog" style="height:10px"><i style="width:68%"></i></div><button class="btn acc bounce">${I.play}Keep reading</button></div></div>
+    <div class="pasSide st">
+     <div class="bub" style="background:#D6E8FF" data-go="library"><b>1,284</b>volumes in 96 series</div>
+     <div class="bub" style="background:#DDF5E8" data-go="library"><b>38</b>series finished</div>
+     <div class="bub" style="background:#FFF1C9" data-go="library"><b>412 GB</b>all on this PC</div>
+     <div class="bub" style="background:#FFD9D0" data-go="import"><b>+ Add</b>drop CBZ files</div>
+    </div>
+   </div>
+  </div>
+ </div>`},
+ hud(){return nav("home")+`
+ <div class="hud"><div class="hgrid"></div>
+  <div class="hCols">
+   <div class="hPanel">
+    <div class="hT"><span>TARGET LOCKED</span><span>01</span></div>
+    <div class="hL">SERIES</div><div class="hV o" style="font-size:24px">PAPER RONIN</div>
+    <div class="hL">ARCHIVE</div><div class="hV">paper_ronin_v07.cbz</div>
+    <div class="hL">SIZE · FORMAT</div><div class="hV">1.3 GB · ZIP STORED</div>
+    <div class="hL">INDEX READ</div><div class="hV b">0.09 s · 208 PAGES</div>
+    <div class="hL">CACHE</div><div class="hV b">p.136–150 · 112 MB</div>
+    <div class="hL">DIRECTION</div><div class="hV">RIGHT → LEFT</div>
+   </div>
+   <div class="hCenter">
+    <svg class="dial" viewBox="0 0 430 430" aria-hidden="true">
+     <g class="r1"><circle cx="215" cy="215" r="200" fill="none" stroke="rgba(143,163,173,.35)" stroke-width="1" stroke-dasharray="2 10"/></g>
+     <circle cx="215" cy="215" r="178" fill="none" stroke="rgba(255,138,0,.15)" stroke-width="6"/>
+     <circle class="pa" cx="215" cy="215" r="178" fill="none" stroke="#FF8A00" stroke-width="6" transform="rotate(-90 215 215)"/>
+     <g class="r2"><circle cx="215" cy="215" r="158" fill="none" stroke="#5FD4FF" stroke-width="1" stroke-dasharray="40 20 4 20" opacity=".6"/></g>
+    </svg>
+    <div class="brk" data-go="reader"><div class="cov">${cover(0,7)}</div><div class="brks"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div><div class="sweep"></div></div>
+    <div class="hPct">VOL 07 · 68% · P.142/208</div>
+   </div>
+   <div class="hPanel" style="animation-delay:.15s">
+    <div class="hT"><span>QUEUE</span><span>04</span></div>
+    ${[[0,8,"Next in series"],[1,5,"Manhwa · 82%"],[4,3,"Manhwa · 34%"],[2,12,"Manga · 9%"]].map(([i,v,t],k)=>`<div class="hq" data-go="${k?'reader':'volume'}"><div class="cov">${cover(i,v,"h"+k)}</div><div><b style="font-weight:600">${SER[i].t.toUpperCase()}</b><small>VOL ${v} · ${t}</small></div><span style="font-size:11px;color:var(--muted)">0${k+1}</span></div>`).join("")}
+   </div>
+  </div>
+  <div class="hBot">
+   <div><div class="hL" style="margin:0">PAGES / DAY · 30 DAYS</div><div class="hV b">avg 64 · today 38</div></div>
+   <svg class="spark" viewBox="0 0 700 60" preserveAspectRatio="none" style="width:100%;height:60px" aria-hidden="true"><polyline fill="none" stroke="#5FD4FF" stroke-width="2" points="${Array.from({length:30},(_,k)=>`${k*24},${50-((Math.sin(k*.7)+1)*16+(k%5)*3)}`).join(" ")}"/></svg>
+   <button class="btn acc" data-go="reader">${I.play}Engage · Resume</button>
+  </div>
+ </div>`},
+ ink(){const ring=[0,1,4,2,9,5,3];return nav("home")+`
+ <div class="inkTop">
+  <div class="inkL" id="inkL">
+   <div class="mono2" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px">NOW READING · <span id="iType">MANGA</span> · SERIES <span id="iId">001</span> / 096</div>
+   <div class="inkNo">№<span id="iVol">07</span></div>
+   <h2 class="inkT" id="iTitle">Paper Ronin</h2>
+   <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.5px" id="iMeta"></div>
+   <div class="segbar" id="iBar"></div>
+   <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)" id="iPg"></div>
+   <div style="display:flex;gap:10px;margin-top:20px"><button class="btn acc" data-go="reader">${I.play}RESUME</button><button class="btn out" data-go="volume">OPEN SERIES</button></div>
+  </div>
+  <div class="inkR" id="inkR"><div class="burst"></div><div class="dots"></div>
+   <div class="tagA">IN PROGRESS · 7 SERIES</div>
+   <div class="bubble2" id="iBub">3 days<br>ago!</div>
+   <div class="flow" id="flow">${ring.map((i,k)=>`<div class="fc" data-i="${i}"><div class="cov">${cover(i,SER[i].cur,"k"+k)}</div></div>`).join("")}</div>
+   <div class="flowNav"><button id="fNext" aria-label="Next series">&#9664;</button><span id="fIdx">1 / 7</span><button id="fPrev" aria-label="Previous series">&#9654;</button></div>
+  </div>
+ </div>
+ <div class="inkMid">
+  <div class="ip"><h4 id="iCard">Reading card · Vol. 07</h4><div class="lcards"><div class="lc c3"></div><div class="lc c2"></div>
+   <div class="lc c1" style="padding:12px"><div class="lch"><b>SESSIONS</b><span id="iCardV">VOL 07</span></div>
+    <table><tbody>${[["11.11.26","p.104–142","38 pp"],["09.11.26","p.61–104","43 pp"],["06.11.26","p.1–61","61 pp"],["02.11.26","VOL 06 END","—"]].map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>
+    <div class="stampB" style="bottom:12px;right:12px">IN PROGRESS</div></div></div></div>
+  <div class="ip"><h4>Up next in this series</h4><div class="upn" id="iUp">${[8,9,10].map(v=>`<div data-go="volume" style="cursor:pointer"><div class="cov">${cover(0,v,"n",v)}</div><small>№${String(v).padStart(2,"0")} · UNREAD · 1.4 GB</small></div>`).join("")}</div></div>
+  <div class="ip" data-go="import"><div class="burstW"></div><h4 style="color:#9A968E">Import</h4><div class="big">Drop CBZ<br>files <span>here!</span></div><div style="position:relative;font-size:13px;margin-top:12px;line-height:1.5">Or a whole folder. "Title v03.cbz" is filed as volume 3 of Title automatically, at any file size.</div></div>
+ </div>
+ <div class="pad"><table class="bTab"><thead><tr><th>ID</th><th>SERIES</th><th>TYPE</th><th>VOLS</th><th>READ</th><th>SIZE</th><th>STATUS</th></tr></thead><tbody>
+  ${[[0,"OUT"],[1,"OUT"],[2,"OUT"],[3,"FINISHED"],[4,"OUT"],[6,"ON SHELF"]].map(([i,st],k)=>{const s=SER[i];return `<tr data-go="volume"><td>${String(k+1).padStart(3,"0")}</td><td><b>${s.t.toUpperCase()}</b></td><td>${s.ty.toUpperCase()}</td><td>${s.v}</td><td>${s.r}/${s.v}</td><td>${s.sz}</td><td><span class="ink-st ${st==='OUT'?'out':''}">${st}</span></td></tr>`}).join("")}
+ </tbody></table><div style="height:30px"></div></div>`}
+};
+
+/* ---------- OTHER SCREENS ---------- */
+function library(view){
+  view=view||"grid";
+  return nav("library")+`<div class="pad in">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin:10px 0 16px">
+   <div><h2 class="h2">Library</h2><div class="mono" style="font-size:12px;color:var(--muted);margin-top:8px">96 series · 1,284 volumes · 412 GB · all local</div></div>
+   <div class="seg" id="vseg">${["grid","list"].map(v=>`<button data-view="${v}" aria-pressed="${v===view}">${v==="grid"?"Covers":"Details"}</button>`).join("")}</div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px">${["All","Manga","Manhwa","Reading","Unread","Finished"].map((c,k)=>`<button class="chip ${k?'':'on'}">${c}</button>`).join("")}<span style="margin-left:auto;font-size:12px;color:var(--muted);align-self:center">Sort: Recently read</span></div>
+  <div class="libGrid ${view==='list'?'list':''} st">${SER.map((s,i)=>`<div class="card" data-go="volume"><div class="cov">${cover(i)}</div><div><div class="t">${s.t}</div><div class="s">${s.r} / ${s.v} volumes read</div></div><span class="x">${s.ty} · ${s.g}</span><span class="x mono">${s.v} vols</span><span class="x mono">${s.sz}</span><div class="prog"><i style="width:${pct(s)}%"></i></div></div>`).join("")}</div>
+  <div style="height:30px"></div></div>`;
+}
+function volume(){const s=SER[0];
+  return nav("library")+`<div class="vHead in">
+   <div class="cov" style="box-shadow:${C==='tone'?'10px 10px 0 #E3242B':C==='riso'?'8px 8px 0 #0078BF':'0 20px 40px rgba(0,0,0,.2)'}">${cover(0,7)}</div>
+   <div><div class="mono" style="font-size:12px;color:var(--muted)">Imported from D:\\Downloads\\Paper Ronin</div>
+    <h2 class="h2" style="font-size:58px;margin-top:8px">Paper Ronin</h2>
+    <p class="jp" style="letter-spacing:6px;color:var(--muted);margin:8px 0 12px">ペーパーローニン</p>
+    <div style="display:flex;gap:6px"><span class="chip">Manga</span><span class="chip">Right to left</span><span class="chip">Seinen</span></div>
+    <div class="stats"><div><b>14</b>volumes</div><div><b>6</b>finished</div><div><b>2,912</b>pages</div><div><b>18.6 GB</b>on disk</div></div>
+    <div style="display:flex;gap:10px"><button class="btn acc" data-go="reader">${I.play}Resume Vol. 7 · p.142</button><button class="btn out" data-go="import">${I.plus}Add volumes</button></div></div>
+  </div>
+  <div class="pad"><div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 14px"><b style="font-family:var(--fd);font-size:22px">Volumes</b><span style="font-size:12px;color:var(--muted)">Sorted by volume number from file name</span></div>
+  <div class="vols st">${Array.from({length:14},(_,v)=>{const p=v<6?1:v===6?.68:0;return `<div class="vol" data-go="reader"><div class="cov">${cover(0,v+1,"v",v)}</div><div class="m"><b>Vol. ${String(v+1).padStart(2,"0")}</b><span>${p===1?'Read':p?'68%':'New'}</span></div><div class="prog" style="margin-top:5px;height:3px"><i style="width:${p*100}%"></i></div></div>`}).join("")}<div class="vol add" data-go="import"><div class="cov">+ Add<br>Vol. 15</div></div></div>
+  <div style="margin:26px 0 8px;font-family:var(--fd);font-size:18px;font-weight:700">Files</div>
+  <table class="ftable mono"><thead><tr><th>File</th><th>Volume</th><th>Size</th><th>Pages</th><th>Archive</th><th>Opened in</th></tr></thead><tbody>
+   <tr><td>Paper Ronin v07.cbz</td><td>7</td><td>1.3 GB</td><td>208</td><td>ZIP · stored</td><td>0.09 s</td></tr>
+   <tr><td>Paper Ronin v08.cbz</td><td>8</td><td>1.4 GB</td><td>212</td><td>ZIP · stored</td><td>0.08 s</td></tr>
+   <tr><td>Paper Ronin Omnibus v01-06.cbz</td><td>1–6</td><td>7.9 GB</td><td>1,198</td><td>ZIP64</td><td>0.31 s</td></tr></tbody></table>
+  <div style="height:30px"></div></div>`;
+}
+function reader(mode){
+  mode=mode||"spread";
+  let pages;
+  if(mode==="single")pages=`<div class="pg">${pageArt(2)}<div class="flip">${pageArt(3)}</div></div>`;
+  else if(mode==="strip")pages=`<div class="pg" style="aspect-ratio:1/1.9"><div class="strip">${stripArt(6,["#1C2A3A","#F7C531","#2F5D62","#5B2A1F","#ECE5D8","#33415C"])}</div></div>`;
+  else pages=`<div class="pg">${pageArt(1)}<div class="flip">${pageArt(4)}</div></div><div class="pg">${pageArt(2)}</div>`;
+  return `<div class="rd in">
+   <div class="rTop"><div style="display:flex;gap:8px"><button class="rb" data-go="home" aria-label="Back">${I.back}</button>${[["spread","Spread"],["single","Single"],["strip","Long strip"]].map(([k,l])=>`<button class="rb" data-mode="${k}" aria-pressed="${k===mode}">${l}</button>`).join("")}</div>
+    <div class="ttl"><b>${mode==="strip"?"TIDEBREAKER · CH. 58":"PAPER RONIN · VOL. 07"}</b><span>${mode==="strip"?"Long strip · 41%":"Page 142 / 208 · right to left"}</span></div>
+    <div style="display:flex;gap:8px"><button class="rb">Fit</button><button class="rb">100%</button><button class="rb" aria-label="More">⋯</button></div></div>
+   <div class="rStage"><div class="spread">${pages}</div></div>
+   <div class="rBot"><div class="thumbs">${Array.from({length:15},(_,k)=>`<i class="${k===7?'cur':k>2&&k<13?'c':''}"></i>`).join("")}</div>
+    <div class="scrub"><span>208</span><div class="tr"><i></i></div><span>142 / 208 · pages 136–150 cached</span></div></div>
+   <div class="zenHint">Move the mouse to show controls</div>
+  </div>`;
+}
+function importScr(){
+  const q=[["Ashen Tide v12.cbz","1.9 GB",2,12,"Ashen Tide → Vol. 12"],["Ashen Tide v13.cbz","2.1 GB",2,13,"Ashen Tide → Vol. 13"],["Ember Ward Vol 04.cbz","3.4 GB",4,4,"Ember Ward → Vol. 4"],["Quiet Blade Omnibus 01-05.cbz","8.2 GB",8,1,"Quiet Blade → Vols. 1–5"],["chapter_bundle_final.cbz","640 MB",10,0,"No match: choose a series"]];
+  return nav("import")+`<div class="pad in" style="margin:6px 0 12px"><h2 class="h2">Import volumes</h2><div style="font-size:14px;color:var(--muted);margin-top:8px">Add CBZ files or a whole folder. Nothing is uploaded; KOMA only reads the files on your PC.</div></div>
+  <div class="imp">
+   <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="drop"><svg class="border" aria-hidden="true"><rect x="2" y="2" style="width:calc(100% - 4px);height:calc(100% - 4px)" rx="${C==='neon'?22:C==='riso'?14:6}"/></svg>
+     ${[-120,0,130].map((x,k)=>`<div class="flying" style="--sx:${x}px;animation-delay:${k*.5}s;top:46px;width:34px;height:46px"></div>`).join("")}
+     ${I.up}<div style="font-family:var(--fd);font-size:26px;font-weight:800">Drop CBZ files or a folder</div>
+     <div style="font-size:13px;color:var(--muted)">CBZ · ZIP · CBR · folders of images · files of any size</div>
+     <div style="display:flex;gap:8px"><button class="btn">Choose files</button><button class="btn out">Choose folder</button></div></div>
+    <div class="rule mono">Series detection: <b>{Series} v{NN}.cbz</b> · <b>{Series} Vol {N}.cbz</b> · <b>{Series} {NN}-{NN}.cbz</b>. A ComicInfo.xml inside the archive overrides the file name.</div>
+    <div class="opts"><button class="opt" aria-pressed="true"><b>Keep files where they are</b><small>KOMA saves only a link. No extra disk space used.</small></button><button class="opt" aria-pressed="false"><b>Copy into KOMA library folder</b><small>One tidy folder: Series\\Vol NN.cbz</small></button></div>
+   </div>
+   <div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><b style="font-family:var(--fd);font-size:20px">Detected · 5 files · 16.2 GB</b><button class="btn acc" style="padding:8px 14px;min-height:40px">Add all</button></div>
+    <div class="q st">${q.map(([f,sz,i,v,m],k)=>`<div class="qi"><div class="cov">${cover(i,v||undefined,"q"+k)}</div><div><div style="display:flex;justify-content:space-between"><b>${f}</b><span class="mono">${sz}</span></div><div style="font-size:12px;margin:2px 0 6px;color:${v?'var(--text)':'var(--acc)'}">${m}</div><div class="prog"><i style="animation-delay:${k*.4}s"></i></div><div class="stage"><span class="d">✓ Read index ${["0.12","0.14","0.22","0.41","0.05"][k]} s</span><span class="${k<3?'d':''}">${k<3?'✓':'…'} Cover</span><span>Thumbnails</span></div></div></div>`).join("")}</div>
+   </div>
+  </div>`;
+}
+
+/* ---------- captions ---------- */
+const CAP={
+ tone:{home:"<b>Screentone home</b> is laid out as a manga page: panels with slanted borders slam in one by one. The big panel is the volume you're on, with a speech bubble and a hard red shadow. Next to it: the next volumes in the series, a library count in comic sound-effect lettering, and a drop panel for importing.",library:"Thick black ink borders on covers; hovering throws a red offset shadow. Covers or Details view.",volume:"Series page with every volume, its progress, and the files behind it. Shows the large-file promise: a 7.9 GB omnibus opens in 0.31 s.",reader:"A warm paper-colored stage with faint rotating speed lines and a heavy black frame with a red shadow. Feels like reading a printed tankōbon.",import:"Drag files in and they fly into the drop zone. Each file shows which series and volume it was matched to; unmatched files are flagged in red."},
+ ukiyo:{home:"<b>Ukiyo Shelf home:</b> a woodblock-print hero with moving seigaiha waves and a rising sun, then real wooden bookshelves. Every volume is a spine with a vertical title, and hovering pulls it up off the shelf. This is the concept most about owning a collection.",library:"Softer: indigo and persimmon covers with a wave pattern, and a gentle lift with shadow on hover.",volume:"Mincho serif headings give the series page a printed-book feel.",reader:"A deep indigo reading room with a faint wave texture; the page sits in a cream mat with a thin persimmon rule, like a framed print.",import:"The same import flow, styled with washi paper and indigo ink."},
+ neon:{home:"<b>Neon Seoul home</b> is built for manhwa readers: a 3D carousel of in-progress volumes that rotates on its own (click a side cover to bring it forward), glass panels, progress rings and live auto-scrolling previews of long strips.",library:"Rounded 14 px covers and a coral glow on hover.",volume:"Dark, with large rounded cards.",reader:"Near-black stage with a soft mint glow around the page; the most comfortable for long night sessions.",import:"Glass drop zone with a rounded marching-ants border."},
+ zen:{home:"<b>Sumi Zen home</b> is calm: one current volume inside an ensō circle drawn by brush (its gap is your remaining progress), large serif numbers, then a hairline list of other series. A single red dot marks what's active.",library:"Very little decoration. Hover shows a thin red underline.",volume:"Mostly white space; the numbers do the talking.",reader:"<b>Disappearing chrome:</b> controls stay hidden until you move the mouse, leaving just the page on off-white. Hover over the window to see them.",import:"Plain and quiet: a dashed box and a list."},
+ riso:{home:"<b>Riso Zine home</b> is a bento grid printed in fluorescent pink, blue and yellow: a ticker, a cover with misregistered print layers that jitter, wobbling stickers and a big library count.",library:"Ink-outlined covers that tilt with a pink and blue double shadow on hover.",volume:"Playful but still readable, with a blue offset shadow on the cover.",reader:"A blue stage with a pink frame and yellow shadow. Bold, but the page itself stays clean.",import:"The most fun drop zone of the five; the queue still shows exactly what gets matched."},
+ emaki:{home:"<b>Moon Emaki home:</b> a gold moon rises behind tonight's volume in a gold-leaf frame while sakura petals fall. Below, an emaki (picture scroll) of everything you've read lately drifts sideways along a dotted gold path; hover to pause it.",library:"Gold hairline outlines and a deep shadow on hover. Elegant and quiet.",volume:"Kaisei serif headings on plum, gold numbers. Feels like a collector's edition.",reader:"A dark plum room; the page sits in a double gold mat with a faint glow.",import:"Same import flow, with gold dashed edges on plum."},
+ arcade:{home:"<b>Shōnen Arcade home</b> makes reading a game: a blinking CONTINUE? countdown, save slots for each in-progress series with 10-segment health-bar progress, an XP bar for pages read and unlockable achievements. Animations use stepped, frame-by-frame timing so it feels like an 8-bit screen.",library:"Pixel-bordered covers that snap a pink drop shadow on hover.",volume:"Pixel font headings; every volume is like a level.",reader:"CRT scanlines over the stage, a cyan pixel frame and a pink shadow. Fun without getting in the way of the page.",import:"The empty slot on Home ('NEW GAME') leads here."},
+ card:{home:"<b>Archive Card home</b> is brutalist and typographic: a giant volume number, hard 2 px rules, and a stack of library reading cards that log each session (fan them by hovering) with an orange IN PROGRESS stamp. Below is a catalog table, with an orange row highlight on hover.",library:"Square chips and covers; hover pushes the cover up-left over an orange block shadow.",volume:"Monospace everywhere: precise, like a database you can feel.",reader:"Light gray stage with a hard black frame and orange shadow, like a print proof.",import:"Fits this concept perfectly: a table of files, sizes and matches."},
+ pastel:{home:"<b>Pastel Cloud home</b> is soft and friendly: slowly floating color blobs, a greeting, story-style cards (new manhwa chapters scroll live inside them), one big continue card with a bouncing button and four squishy stat bubbles.",library:"18 px rounded covers that bounce and tilt on hover.",volume:"Pill buttons and rounded everything.",reader:"Lavender stage with the page on a floating white card. The gentlest reader of the set.",import:"Rounded drop zone; good if you want something cozy rather than edgy."},
+ hud:{home:"<b>Mecha HUD home</b> treats the current volume as a locked target: corner brackets snap on, a scan line sweeps across the cover, an orange dial fills to your progress, and side panels read out real file info (size, index time, cache range). The bottom shows a pages-per-day chart that draws itself.",library:"Square covers; hover adds an orange targeting outline.",volume:"Angular cut-corner buttons and Chakra Petch type.",reader:"Grid-lined stage with a cut-corner frame. Shows off the technical side of the large-file engine.",import:"Import as a data readout. Fits power users with huge libraries."},
+ ink:{home:"<b>Ink Archive home, merging your three picks.</b> From 9: the giant volume number, 3 px grid rules, the stamped reading card and the catalog table. From 2: ink-black panels with slanted edges, halftone dots, a rotating speed-line burst, a speech bubble and the hard red shadow. From 4: the rotating 3D carousel of in-progress series. The carousel drives the left column: every time it turns, the number, title and 20-segment progress bar slam in for that series. Hover the carousel to pause it, use the arrows, click a side cover to bring it forward, or click the front cover to open the reader.",library:"Covers get 3 px ink borders and push up-left over a red block shadow. Titles use the Anton display font and details use the mono font. The Details view becomes a catalog list that turns red on hover.",volume:"The series page with the Archive Card's bordered stats band, mono file table with black header, and a red block shadow on the cover.",reader:"The Screentone reader: warm paper stage, slow speed lines, a heavy black frame with red shadow, mono page counter and square controls.",import:"Square, bordered import queue. The dashed drop zone is drawn in ink, and the selected option gets a red block shadow."}
+};
+
+/* ---------- render ---------- */
+let libView="grid",rMode="spread",flowTimer=null;
+function render(){
+  document.body.className="c-"+C+(C==="ink"&&DARK?" dark":"");
+  document.getElementById('picker').innerHTML=CON.map(c=>`<button class="pk" data-c="${c.id}" aria-pressed="${c.id===C}"><span class="n">${c.n.toUpperCase()}</span><b>${c.name}</b><small>${c.tag}</small><span class="sw">${c.sw.map(x=>`<i style="background:${x}"></i>`).join("")}</span></button>`).join("");
+  document.getElementById('tabs').innerHTML=SCR.map(([k,l])=>`<button class="tab" role="tab" data-s="${k}" aria-selected="${k===S}">${l}</button>`).join("");
+  const app=document.getElementById('app');
+  app.className=S==="reader"?"noscroll":"";
+  app.innerHTML=S==="home"?HOME[C]():S==="library"?library(libView):S==="volume"?volume():S==="reader"?reader(rMode):importScr();
+  app.scrollTop=0;
+  document.getElementById('tbt').textContent="KOMA · "+CON.find(c=>c.id===C).name+" · "+SCR.find(s=>s[0]===S)[1];
+  document.getElementById('cap').innerHTML=`<b>${CON.find(c=>c.id===C).n}</b> · `+CAP[C][S];
+  clearInterval(flowTimer);
+  if(C==="neon"&&S==="home")startFlow();
+  if(C==="ink"&&S==="home")startInk();
+  document.getElementById("accTog").style.display=C==="ink"?"flex":"none";
+  if(C==="ink"&&ACC)document.body.style.setProperty("--acc",ACC);else document.body.style.removeProperty("--acc");
+}
+
+function startInk(){
+  const cards=[...document.querySelectorAll('#flow .fc')];let center=0,first=true;
+  const L=document.getElementById('inkL');
+  const info=()=>{const i=+cards[center].dataset.i,s=SER[i],seg=Math.round(s.p/s.of*20);
+    document.getElementById('iType').textContent=s.ty.toUpperCase();
+    document.getElementById('iId').textContent=String(i+1).padStart(3,"0");
+    document.getElementById('iVol').textContent=String(s.cur).padStart(2,"0");
+    document.getElementById('iTitle').textContent=s.t;
+    document.getElementById('iMeta').textContent=`${s.j} / ${s.v} VOLS / ${s.sz} / ${s.ty==="Manhwa"?"LONG STRIP":"RIGHT-TO-LEFT"}`;
+    document.getElementById('iBar').innerHTML=Array.from({length:20},(_,n)=>`<i class="${n<seg?'on':''}"></i>`).join("");
+    document.getElementById('iPg').textContent=`P.${s.p} / ${s.of} — ${Math.round(s.p/s.of*100)}% OF VOL ${s.cur}`;
+    const vv=String(s.cur).padStart(2,"0");document.getElementById('iCard').textContent='Reading card · Vol. '+vv;document.getElementById('iCardV').textContent='VOL '+vv;
+    document.getElementById('iUp').innerHTML=[1,2,3].map(n=>{const v=s.cur+n;return v<=s.v?`<div data-go="volume" style="cursor:pointer"><div class="cov">${cover(i,v,"n",v)}</div><small>№${String(v).padStart(2,"0")} · UNREAD</small></div>`:`<div style="border:2px dashed var(--ink);display:grid;place-items:center;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;aspect-ratio:3/4.3">ALL CAUGHT UP<br>+ IMPORT №${String(v).padStart(2,"0")}</div>`}).join("");
+    document.getElementById('fIdx').textContent=`${center+1} / ${cards.length}`;
+    if(!first){L.classList.remove('swap');void L.offsetWidth;L.classList.add('swap')}first=false;};
+  const place=()=>{cards.forEach((el,k)=>{let d=((k-center)%cards.length+cards.length)%cards.length;if(d>3)d-=cards.length;
+    const a=Math.abs(d);el.className="fc c"+a;
+    el.style.transform=`translateX(${d*175}px) translateZ(${-a*170}px) rotateY(${-d*30}deg)`;
+    el.style.zIndex=10-a;el.style.opacity=a>2?0:a>1?.5:1;el.style.filter=d?"grayscale(.6) brightness(.9)":"none";});info();};
+  place();
+  cards.forEach((el,k)=>el.addEventListener('click',e=>{e.stopPropagation();if(k===center){S='reader';render();return}center=k;place()}));
+  document.getElementById('fPrev').onclick=e=>{e.stopPropagation();center=(center-1+cards.length)%cards.length;place()};
+  document.getElementById('fNext').onclick=e=>{e.stopPropagation();center=(center+1)%cards.length;place()};
+  let paused=false;const R=document.getElementById('inkR');R.onmouseenter=()=>paused=true;R.onmouseleave=()=>paused=false;
+  flowTimer=setInterval(()=>{if(!paused){center=(center+1)%cards.length;place()}},3600);
+}
+function startFlow(){
+  const cards=[...document.querySelectorAll('.fc')];let center=0;
+  const place=()=>cards.forEach((el,k)=>{let d=((k-center)%cards.length+cards.length)%cards.length;if(d>2)d-=cards.length;
+    el.className="fc c"+Math.abs(d);
+    el.style.transform=`translateX(${d*210}px) translateZ(${-Math.abs(d)*180}px) rotateY(${-d*28}deg)`;
+    el.style.zIndex=10-Math.abs(d);el.style.opacity=Math.abs(d)>1?.45:1;el.style.filter=d?"brightness(.65)":"none";});
+  place();
+  cards.forEach((el,k)=>el.addEventListener('click',e=>{if(k!==center){e.stopPropagation();center=k;place()}},true));
+  flowTimer=setInterval(()=>{center=(center+1)%cards.length;place()},3200);
+}
+document.addEventListener('click',e=>{
+  const dk=e.target.closest('[data-dark]');if(dk){DARK=dk.dataset.dark==='1';document.querySelectorAll('[data-dark]').forEach(x=>x.setAttribute('aria-pressed',x===dk));document.body.classList.toggle('dark',DARK&&C==='ink');return}
+  const ac=e.target.closest('[data-acc]');if(ac){ACC=ac.dataset.acc;document.querySelectorAll('[data-acc]').forEach(x=>x.setAttribute('aria-pressed',x===ac));document.body.style.setProperty('--acc',ACC);return}
+  const pk=e.target.closest('.pk');if(pk){C=pk.dataset.c;render();return}
+  const tb=e.target.closest('.tab');if(tb){S=tb.dataset.s;render();return}
+  const v=e.target.closest('[data-view]');if(v){libView=v.dataset.view;render();return}
+  const m=e.target.closest('[data-mode]');if(m){rMode=m.dataset.mode;render();return}
+  const o=e.target.closest('.opt');if(o){o.parentElement.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===o));return}
+  const g=e.target.closest('[data-go]');if(g){S=g.dataset.go;render();}
+});
+render();
+</script>
+</body>
+</html>
