@@ -1,0 +1,17 @@
+/* Settings */
+.page-title {
+    -fx-font-family: "Anton";
+    -fx-font-size: 64px;
+    -fx-text-fill: -text;
+}
+.settings-row {
+    -fx-padding: 14 0 14 0;
+    -fx-border-color: transparent transparent -line transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-color: -bg2;
+    -fx-background-radius: 0;
+}
+.spinner .increment-arrow, .spinner .decrement-arrow { -fx-background-color: -text; }
+.spinner .text-field { -fx-border-width: 0; }

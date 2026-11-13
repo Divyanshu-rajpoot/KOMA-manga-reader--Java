@@ -1,0 +1,78 @@
+/* Title bar, nav bar. */
+.titlebar {
+    -fx-background-color: -titlebar;
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0 0 0 14;
+}
+.titlebar-title {
+    -fx-text-fill: -on-titlebar;
+    -fx-font-size: 13px;
+}
+.win-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-min-width: 46px;
+    -fx-pref-width: 46px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0;
+}
+.win-button .glyph { -fx-background-color: -on-titlebar; }
+.win-button:hover { -fx-background-color: rgba(255, 255, 255, 0.12); }
+.win-button.close:hover { -fx-background-color: -acc; }
+.win-button.close:hover .glyph { -fx-background-color: -on-acc; }
+
+.navbar {
+    -fx-padding: 14 36 14 36;
+    -fx-background-color: -bg;
+}
+.logo { -fx-cursor: hand; }
+.logo-box {
+    -fx-background-color: -acc;
+    -fx-min-width: 28; -fx-pref-width: 28; -fx-max-width: 28;
+    -fx-min-height: 28; -fx-pref-height: 28; -fx-max-height: 28;
+}
+.logo-mark {
+    -fx-font-family: "Noto Sans JP";
+    -fx-font-size: 16px;
+    -fx-text-fill: -on-acc;
+}
+.logo-word {
+    -fx-font-family: "Anton";
+    -fx-font-size: 24px;
+    -fx-text-fill: -text;
+}
+.nav-tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-text-fill: -muted;
+    -fx-font-size: 14px;
+    -fx-padding: 10 14 10 14;
+    -fx-cursor: hand;
+}
+.nav-tab:hover { -fx-text-fill: -text; }
+.nav-tab:selected {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+    -fx-font-weight: bold;
+}
+.nav-search {
+    -fx-padding: 0 60 0 36;
+    -fx-pref-height: 40px;
+    -fx-min-height: 40px;
+    -fx-font-size: 13px;
+}
+.search-box .glyph { -fx-background-color: -muted; }
+.kbd {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 10px;
+    -fx-text-fill: -muted;
+    -fx-border-color: -line;
+    -fx-border-width: 1;
+    -fx-padding: 1 5 1 5;
+}
+.navbar .icon-button .glyph { -fx-background-color: -text; }
+.accent-button .glyph { -fx-background-color: -on-acc; }
+.ink-button .glyph { -fx-background-color: -on-ink; }
+.outline-button .glyph, .icon-button .glyph { -fx-background-color: -text; }
+.glyph { -fx-background-color: -text; }

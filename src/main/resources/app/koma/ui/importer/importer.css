@@ -1,0 +1,44 @@
+/* Import */
+.page-title {
+    -fx-font-family: "Anton";
+    -fx-font-size: 64px;
+    -fx-text-fill: -text;
+}
+.drop-zone { -fx-background-color: -panel; }
+.ants {
+    -fx-fill: transparent;
+    -fx-stroke: -ink;
+    -fx-stroke-width: 3;
+    -fx-stroke-dash-array: 12 8;
+}
+.drop-icon { -fx-background-color: -ink; }
+.drop-title { -fx-font-size: 24px; -fx-font-weight: bold; }
+.rules-box {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 12 14 12 14;
+}
+.rules-text { -fx-font-family: "IBM Plex Mono"; -fx-font-size: 12px; -fx-fill: -text; }
+.rules-bold { -fx-font-family: "IBM Plex Mono Medium"; -fx-font-weight: bold; }
+.option-card {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 12 14 12 14;
+    -fx-cursor: hand;
+}
+.option-card:hover { -fx-background-color: -bg2; }
+.option-card.selected { -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 6, 6); }
+.import-row {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 12 14 12 12;
+}
+.import-thumb { -fx-background-color: -bg2; }
+.step-done { -fx-font-size: 12px; -fx-text-fill: -text; }
+.step-todo { -fx-font-size: 12px; -fx-text-fill: -muted; }
+.import-row .glyph { -fx-background-color: -text; }
+.edit-link { -fx-text-fill: -muted; -fx-font-size: 12px; -fx-border-color: transparent; -fx-padding: 0; }
+.edit-link:hover { -fx-text-fill: -acc; }

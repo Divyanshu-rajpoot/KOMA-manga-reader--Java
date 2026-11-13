@@ -14,25 +14,32 @@
 
 ## Folder layout
 ```
-koma/
-  CLAUDE.md, pom.xml
-  docs/  design/
+Koha Manga Reader Java/
+  pom.xml, mvnw, mvnw.cmd, .mvn/     Maven build + wrapper (.mvn/jvm.config: use the Windows cert store)
+  README.md, CLAUDE.md
+  docs/        ARCHITECTURE.md (this file), DESIGN.md
+  design/      koma-concept-12.html + screens/ (visual reference)
   src/main/java/app/koma/
-    App.java, Launcher.java       (Launcher avoids the JavaFX main-class quirk in fat jars)
-    core/        ThemeManager, MotionPrefs, Anim, Executors, Paths, KeyboardShortcuts
+    Launcher.java, App.java, AppContext.java   entry point, startup, shared services
+    core/        AppPaths, Exec (I/O + decode pools), Json, Settings, ThemeManager, MotionPrefs, Anim, WinPrefs
+    archive/     CbzIndex (ZipFile wrapper, ZIP64), NaturalSort, ImageSniffer
+    imaging/     PageDecoder (decode + box/bilinear resize), PageCache (byte-weighted LRU), PageLoader (preload), ThumbCache
+    library/     Library, Series, Volume, LibraryStore, FileNameParser, ComicInfoReader, ImportService, FolderWatcher
     ui/
-      shell/     TitleBar, NavBar, Router
-      shared/    CoverView, SegmentProgress, InkButton, Chip, Stamp, CatalogTable, Halftone
-      home/      CoverCarousel (SubScene+PerspectiveCamera), InfoColumn, ReadingCard, UpNext
-      library/   series/   reader/ (SpreadView, SingleView, StripView, ThumbStrip, Scrubber)
-      importer/  settings/
-    archive/     CbzIndex (ZipFile wrapper), EntryReader, NaturalSort, ImageSniffer
-    library/     Series, Volume, LibraryStore (Jackson), FileNameParser, ComicInfoReader
-    imaging/     PageDecoder, Resizer, PageCache (byte-weighted LRU), Preloader, ThumbCache
+      shell/     MainWindow, TitleBar, NavBar, Router, Screen, View, WindowResizer
+      shared/    CoverView, SegmentProgress, ThinProgress, CatalogTable, SlantPanel, Halftone, SpeedBurst, ResponsiveGrid, Icons, Fmt, Css
+      home/      HomeView, CoverCarousel (per-card PerspectiveTransform), InfoColumn, ReadingCard, UpNext, DropPanel
+      library/   LibraryView
+      series/    SeriesView
+      reader/    ReaderView, PagedView (single + spread), StripView (virtualized long strip), ThumbStrip, ReaderState
+      importer/  ImportView, ImportRow, WatchedImports
+      settings/  SettingsView
+    dev/         DevTour (screenshot tour, only with -Dkoma.devtour)
   src/main/resources/
-    themes/light.css, dark.css, base.css
-    fonts/       Anton, Archivo, IBM Plex Mono, Noto Sans JP (.ttf)
-  src/test/java/ ...
+    themes/      light.css, dark.css (tokens), base.css (components), accent-orange.css
+    app/koma/ui/<screen>/<screen>.css   one stylesheet per screen
+    fonts/       Anton, Archivo, IBM Plex Mono, Noto Sans JP (.ttf) + licenses/
+  src/test/java/app/koma/   archive/, imaging/, library/ (JUnit 5)
 ```
 
 ## Large-CBZ strategy (the core requirement)

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>app.koma</groupId>
+    <artifactId>koma</artifactId>
+    <version>0.1.0</version>
+    <name>KOMA</name>
+    <description>Offline manga and manhwa reader for local CBZ files</description>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>21.0.5</javafx.version>
+        <jackson.version>2.17.2</jackson.version>
+        <twelvemonkeys.version>3.12.0</twelvemonkeys.version>
+        <junit.version>5.10.3</junit.version>
+        <main.class>app.koma.Launcher</main.class>
+        <!-- mvn -Ppackage package: "app-image" = portable folder with KOMA.exe (no extra tools).
+             For an installer set jpackage.type=msi and put the win-menu / win-shortcut flags in jpackage.extra (needs WiX Toolset 3); see README -->
+        <jpackage.type>app-image</jpackage.type>
+        <jpackage.extra></jpackage.extra>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>${twelvemonkeys.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+            <version>${twelvemonkeys.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <excludedGroups>huge</excludedGroups>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                    <options>
+                        <option>-Xmx2g</option>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </options>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Big-file benchmark: mvn test -Phuge (generates a multi-GB ZIP64 CBZ in a temp folder) -->
+        <profile>
+            <id>huge</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups combine.self="override"/>
+                            <groups>huge</groups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Windows app: mvn -Ppackage package (portable app-image by default; see jpackage.type above) -->
+        <profile>
+            <id>package</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.7.1</version>
+                        <executions>
+                            <execution>
+                                <id>copy-libs</id>
+                                <phase>package</phase>
+                                <goals><goal>copy-dependencies</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/jpackage-input</outputDirectory>
+                                    <includeScope>runtime</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage</id>
+                                <phase>package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="${project.build.directory}/${project.build.finalName}.jar"
+                                              todir="${project.build.directory}/jpackage-input"/>
+                                        <exec executable="${java.home}/bin/jpackage" failonerror="true">
+                                            <arg line="--name KOMA --app-version ${project.version} --vendor KOMA"/>
+                                            <arg value="--input"/>
+                                            <arg value="${project.build.directory}/jpackage-input"/>
+                                            <arg line="--main-jar ${project.build.finalName}.jar --main-class ${main.class}"/>
+                                            <arg value="--dest"/>
+                                            <arg value="${project.build.directory}/installer"/>
+                                            <arg line="--type ${jpackage.type} ${jpackage.extra}"/>
+                                            <arg line="--add-modules java.base,java.desktop,java.xml,java.logging,java.naming,java.sql,java.management,jdk.unsupported,jdk.charsets,jdk.crypto.ec,jdk.zipfs,jdk.localedata"/>
+                                            <arg line="--jlink-options --strip-debug --jlink-options --no-header-files --jlink-options --no-man-pages"/>
+                                            <arg value="--java-options"/>
+                                            <arg value="-Xmx2g -Dfile.encoding=UTF-8"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

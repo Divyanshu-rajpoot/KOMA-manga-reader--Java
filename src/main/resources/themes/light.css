@@ -1,0 +1,21 @@
+/* KOMA · Ink Archive · light "paper" theme. Tokens only; components live in base.css. */
+.root {
+    -bg: #F1EEE6;
+    -bg2: #E5E1D6;
+    -panel: #FAF8F3;
+    -panel2: #FFFFFF;
+    -text: #0E0E0E;
+    -muted: #55524C;
+    -ink: #0E0E0E;
+    -on-ink: #F1EEE6;
+    -acc: #E3242B;
+    -on-acc: #FFFFFF;
+    -line: rgba(14, 14, 14, 0.2);
+    -reader-bg: #E9E5DC;
+    -titlebar: #0E0E0E;
+    -on-titlebar: #F1EEE6;
+    -cover-grey: #C9C5BC;
+    /* the Import drop panel inverts in dark mode; in light it is ink */
+    -invert-bg: #0E0E0E;
+    -invert-text: #F1EEE6;
+}

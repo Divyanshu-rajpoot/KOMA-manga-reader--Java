@@ -1,0 +1,356 @@
+/*
+ * KOMA · Ink Archive · shared components.
+ * Colors come only from the looked-up tokens in light.css / dark.css.
+ * Square corners everywhere; 2px control borders, 3px panel borders; hard offset shadows.
+ */
+
+.root {
+    -fx-font-family: "Archivo";
+    -fx-font-size: 14px;
+    -fx-background-color: -bg;
+    -fx-text-fill: -text;
+    -fx-focus-color: -acc;
+    -fx-faint-focus-color: transparent;
+    -fx-accent: -acc;
+    -fx-base: -panel;
+    -fx-background: -bg;
+    -fx-control-inner-background: -panel;
+    -fx-text-base-color: -text;
+    -fx-selection-bar: -ink;
+    -fx-selection-bar-non-focused: -ink;
+    -fx-selection-bar-text: -on-ink;
+}
+
+.window-root {
+    -fx-background-color: -bg;
+    -fx-border-color: -ink;
+    -fx-border-width: 1;
+}
+
+.label {
+    -fx-text-fill: -text;
+}
+/* big display numbers drawn as Text with tight (visual) bounds */
+.display-text { -fx-fill: -text; }
+.display-text.accent-fill { -fx-fill: -acc; }
+
+/* ---------- typography ---------- */
+.display {
+    -fx-font-family: "Anton";
+    -fx-text-fill: -text;
+}
+.display-xl { -fx-font-family: "Anton"; -fx-font-size: 146px; -fx-text-fill: -text; }
+.display-l { -fx-font-family: "Anton"; -fx-font-size: 58px; -fx-text-fill: -text; }
+.display-m { -fx-font-family: "Anton"; -fx-font-size: 40px; -fx-text-fill: -text; }
+.display-s { -fx-font-family: "Anton"; -fx-font-size: 22px; -fx-text-fill: -text; }
+.accent-text { -fx-text-fill: -acc; -fx-fill: -acc; }
+.muted { -fx-text-fill: -muted; }
+.mono {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 12px;
+    -fx-text-fill: -text;
+}
+.mono-s {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 11px;
+    -fx-text-fill: -muted;
+}
+.jp {
+    -fx-font-family: "Noto Sans JP";
+}
+.strong { -fx-font-weight: bold; }
+.h2 { -fx-font-size: 20px; -fx-font-weight: bold; }
+.small { -fx-font-size: 13px; }
+
+/* ---------- buttons ---------- */
+.ink-button, .accent-button, .outline-button, .ghost-button, .icon-button {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 0 20 0 20;
+    -fx-min-height: 44px;
+    -fx-pref-height: 44px;
+    -fx-font-family: "Archivo";
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+.ink-button {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+}
+.accent-button {
+    -fx-background-color: -acc;
+    -fx-text-fill: -on-acc;
+    -fx-border-color: -acc;
+    -fx-border-width: 2;
+}
+.outline-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+}
+.ghost-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -muted;
+    -fx-font-weight: normal;
+    -fx-padding: 0 12 0 12;
+}
+.ghost-button:hover { -fx-text-fill: -text; }
+.ink-button:hover, .outline-button:hover {
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 5, 5);
+}
+.accent-button:hover {
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(one-pass-box, -ink, 0, 0, 5, 5);
+}
+.ink-button:pressed, .outline-button:pressed, .accent-button:pressed {
+    -fx-translate-y: 0;
+    -fx-effect: null;
+}
+.ink-button .text, .accent-button .text { -fx-fill: inherit; }
+.button:disabled { -fx-opacity: 0.45; }
+.small-button {
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 12 0 12;
+    -fx-font-size: 12px;
+}
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-min-width: 44px;
+    -fx-pref-width: 44px;
+    -fx-padding: 0;
+    -fx-font-size: 16px;
+}
+.icon-button:hover { -fx-background-color: -bg2; }
+.button > .glyph { -fx-fill: inherit; }
+
+/* ---------- chips / segmented ---------- */
+.chip {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-border-radius: 0;
+    -fx-padding: 4 12 4 12;
+    -fx-font-size: 13px;
+    -fx-text-fill: -text;
+    -fx-cursor: hand;
+}
+.chip:hover { -fx-background-color: -bg2; }
+.chip:selected, .chip.active {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+}
+.segmented {
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 4;
+    -fx-spacing: 0;
+}
+.segmented .chip { -fx-border-width: 0; -fx-padding: 8 12 8 12; }
+
+.tag {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 11px;
+    -fx-padding: 1 6 1 6;
+    -fx-border-color: -ink;
+    -fx-border-width: 1.5;
+    -fx-text-fill: -text;
+}
+.tag.out { -fx-background-color: -acc; -fx-border-color: -acc; -fx-text-fill: -on-acc; }
+.tag.finished { -fx-background-color: -ink; -fx-text-fill: -on-ink; }
+
+/* ---------- panels ---------- */
+.panel {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 3;
+}
+.panel-thin {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+}
+.rule { -fx-background-color: -ink; -fx-min-height: 3; -fx-pref-height: 3; -fx-max-height: 3; }
+.rule-v { -fx-background-color: -ink; -fx-min-width: 3; -fx-pref-width: 3; -fx-max-width: 3; }
+.hairline { -fx-background-color: -line; -fx-min-height: 1; -fx-pref-height: 1; -fx-max-height: 1; }
+.invert-panel { -fx-background-color: -invert-bg; }
+.invert-panel .label { -fx-text-fill: -invert-text; }
+.invert-panel .label.accent-text { -fx-text-fill: -acc; }
+
+/* ---------- inputs ---------- */
+.text-field, .combo-box, .spinner {
+    -fx-background-color: -panel;
+    -fx-background-radius: 0;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-border-radius: 0;
+    -fx-text-fill: -text;
+    -fx-prompt-text-fill: -muted;
+    -fx-highlight-fill: -acc;
+    -fx-highlight-text-fill: -on-acc;
+}
+.text-field:focused, .combo-box:focused { -fx-border-color: -acc; }
+.combo-box .list-cell { -fx-text-fill: -text; -fx-background-color: transparent; }
+.combo-box-popup .list-view {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-background-radius: 0;
+}
+.combo-box-popup .list-cell { -fx-background-color: -panel; -fx-text-fill: -text; -fx-padding: 6 10 6 10; }
+.combo-box-popup .list-cell:hover, .combo-box-popup .list-cell:filled:selected { -fx-background-color: -ink; -fx-text-fill: -on-ink; }
+.combo-box .arrow { -fx-background-color: -text; }
+.combo-box .arrow-button { -fx-background-color: transparent; }
+
+.check-box { -fx-text-fill: -text; }
+.check-box .box {
+    -fx-background-color: -panel;
+    -fx-background-radius: 0;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-border-radius: 0;
+}
+.check-box:selected .box { -fx-background-color: -ink; }
+.check-box:selected .mark { -fx-background-color: -on-ink; }
+
+.slider .track { -fx-background-color: -line; -fx-background-radius: 0; -fx-pref-height: 4; }
+.slider .thumb {
+    -fx-background-color: -acc;
+    -fx-background-radius: 0;
+    -fx-pref-width: 12;
+    -fx-pref-height: 18;
+}
+
+/* ---------- scroll ---------- */
+.scroll-pane, .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar { -fx-background-color: transparent; -fx-pref-width: 10; }
+.scroll-bar:horizontal { -fx-pref-height: 10; }
+.scroll-bar .thumb { -fx-background-color: -line; -fx-background-radius: 0; }
+.scroll-bar .thumb:hover { -fx-background-color: -muted; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-padding: 0; -fx-pref-height: 0; -fx-pref-width: 0; }
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-shape: ""; -fx-padding: 0; }
+.scroll-bar .track, .scroll-bar .track-background { -fx-background-color: transparent; }
+.corner { -fx-background-color: transparent; }
+
+/* ---------- menus / tooltips ---------- */
+.context-menu {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-background-radius: 0;
+    -fx-padding: 4;
+}
+.menu-item { -fx-padding: 6 14 6 14; }
+.menu-item .label { -fx-text-fill: -text; }
+.menu-item:focused { -fx-background-color: -ink; }
+.menu-item:focused .label { -fx-text-fill: -on-ink; }
+.tooltip {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+    -fx-background-radius: 0;
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 11px;
+}
+
+/* ---------- segment progress (20 blocks) ---------- */
+.seg { -fx-background-color: -line; }
+.seg.filled { -fx-background-color: -ink; }
+.seg.last { -fx-background-color: -acc; }
+
+.thin-progress { -fx-background-color: -line; }
+.thin-progress > .fill { -fx-background-color: -acc; }
+
+/* ---------- cover ---------- */
+.cover { -fx-background-color: -panel2; }
+.cover-frame { -fx-border-color: -ink; -fx-border-width: 3; }
+.cover-placeholder { -fx-background-color: -panel2; }
+.cover-placeholder .cover-title { -fx-font-family: "Anton"; -fx-font-size: 20px; -fx-text-fill: -text; }
+.cover-placeholder .cover-jp { -fx-font-family: "Noto Sans JP"; -fx-font-size: 20px; -fx-text-fill: -text; }
+.cover-dot { -fx-fill: -acc; }
+.cover-badge {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+    -fx-font-family: "Anton";
+    -fx-font-size: 16px;
+    -fx-padding: 2 8 2 8;
+}
+.hover-lift:hover {
+    -fx-translate-x: -4;
+    -fx-translate-y: -4;
+    -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 8, 8);
+    -fx-cursor: hand;
+}
+.cover-shadow-10 { -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 10, 10); }
+
+/* ---------- catalog table ---------- */
+.catalog-header { -fx-background-color: -ink; -fx-padding: 9 8 9 8; }
+.catalog-header .label {
+    -fx-text-fill: -on-ink;
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 12px;
+}
+.catalog-row {
+    -fx-padding: 8 8 8 8;
+    -fx-border-color: transparent transparent -line transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+.catalog-row .label { -fx-font-family: "IBM Plex Mono"; -fx-font-size: 12px; -fx-text-fill: -text; }
+.catalog-row .label.strong { -fx-font-weight: bold; }
+.catalog-row:hover { -fx-background-color: -acc; }
+.catalog-row:hover .label { -fx-text-fill: -on-acc; }
+.catalog-row:hover .tag { -fx-border-color: -on-acc; -fx-text-fill: -on-acc; }
+
+/* ---------- speech bubble & stamp ---------- */
+.bubble-shape { -fx-fill: -panel2; -fx-stroke: -ink; -fx-stroke-width: 3; }
+.bubble-text { -fx-font-family: "Anton"; -fx-font-size: 18px; -fx-text-fill: -text; -fx-text-alignment: center; }
+.stamp {
+    -fx-border-color: -acc;
+    -fx-border-width: 3;
+    -fx-padding: 2 10 2 10;
+    -fx-text-fill: -acc;
+    -fx-font-family: "Anton";
+    -fx-font-size: 22px;
+}
+.label-box {
+    -fx-background-color: -ink;
+    -fx-text-fill: -on-ink;
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 11px;
+    -fx-padding: 4 10 4 10;
+}
+
+/* ---------- toast ---------- */
+.toast {
+    -fx-background-color: -ink;
+    -fx-padding: 12 18 12 18;
+    -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 5, 5);
+}
+.toast .label { -fx-text-fill: -on-ink; }
+
+/* ---------- empty state ---------- */
+.empty-title { -fx-font-family: "Anton"; -fx-font-size: 40px; -fx-text-fill: -text; }
+
+/* ---------- textures ---------- */
+.burst-ray { -fx-fill: -ink; -fx-stroke: transparent; }
+.invert-panel .burst-ray { -fx-fill: -invert-text; }
+
+/* ---------- dialogs ---------- */
+.koma-dialog { -fx-background-color: -panel; -fx-border-color: -ink; -fx-border-width: 3; }
+.koma-dialog .content.label, .koma-dialog .label { -fx-text-fill: -text; }
+.koma-dialog .button {
+    -fx-background-color: -ink; -fx-text-fill: -on-ink; -fx-background-radius: 0; -fx-padding: 8 16 8 16;
+}

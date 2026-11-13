@@ -1,0 +1,42 @@
+/* Home */
+.top-band {
+    -fx-border-color: -ink transparent -ink transparent;
+    -fx-border-width: 3 0 3 0;
+}
+.carousel { -fx-background-color: -panel2; }
+.carousel-shadow { -fx-background-color: -acc; }
+.carousel-counter {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 13px;
+    -fx-text-fill: -text;
+    -fx-background-color: -panel2;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 10 16 10 16;
+}
+.carousel-arrow { -fx-background-color: -panel2; }
+
+.slant-fill { -fx-fill: -panel; }
+.slant-outline { -fx-fill: transparent; -fx-stroke: -ink; -fx-stroke-width: 3; }
+.invert-slant .slant-fill { -fx-fill: -invert-bg; }
+
+.drop-big {
+    -fx-font-family: "Anton";
+    -fx-font-size: 46px;
+    -fx-text-fill: -invert-text;
+}
+.drop-panel .drop-kicker { -fx-text-fill: -invert-text; -fx-opacity: 0.6; }
+.drop-panel .label { -fx-text-fill: -invert-text; }
+.drop-panel .label.accent-text { -fx-text-fill: -acc; }
+.drop-panel .burst-ray { -fx-fill: -invert-text; }
+
+.card-back-acc { -fx-background-color: -acc; }
+.card-back-grey { -fx-background-color: -cover-grey; -fx-border-color: -ink; -fx-border-width: 2; }
+.card-front {
+    -fx-background-color: -panel2;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 12 14 12 14;
+}
+.card-rule { -fx-background-color: -ink; -fx-min-height: 2; -fx-pref-height: 2; -fx-max-height: 2; }
+.reading-card .stamp { -fx-background-color: -panel2; }

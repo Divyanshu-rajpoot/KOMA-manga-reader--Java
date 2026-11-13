@@ -1,0 +1,70 @@
+/* Reader: always on the reader background. */
+.reader { -fx-background-color: -reader-bg; }
+.reader .burst-ray { -fx-fill: -ink; }
+.reader-top { -fx-padding: 14 22 10 22; }
+.reader-title {
+    -fx-font-family: "Anton";
+    -fx-font-size: 26px;
+    -fx-text-fill: -text;
+}
+.reader-sub {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+.reader-toggle, .reader-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-text-fill: -text;
+    -fx-font-size: 13px;
+    -fx-min-height: 42px;
+    -fx-pref-height: 42px;
+    -fx-padding: 0 12 0 12;
+    -fx-cursor: hand;
+}
+.reader-button { -fx-min-width: 44px; }
+.reader-toggle:hover, .reader-button:hover { -fx-background-color: -bg2; }
+.reader-toggle:selected {
+    -fx-background-color: -acc;
+    -fx-border-color: -acc;
+    -fx-text-fill: -on-acc;
+}
+.reader-button .glyph { -fx-background-color: -text; }
+.reader-stage { -fx-background-color: transparent; }
+.page-frame {
+    -fx-background-color: -panel;
+    -fx-border-color: -ink;
+    -fx-border-width: 4;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 10, 10);
+}
+.reader-loading {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 13px;
+    -fx-text-fill: -muted;
+}
+.reader-error {
+    -fx-font-family: "Anton";
+    -fx-font-size: 26px;
+    -fx-text-fill: -text;
+    -fx-text-alignment: center;
+}
+.page-thumb {
+    -fx-background-color: -bg2;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-opacity: 0.55;
+    -fx-cursor: hand;
+}
+.page-thumb.cached { -fx-opacity: 0.85; }
+.page-thumb.current { -fx-border-color: -acc; -fx-opacity: 1; -fx-translate-y: -4; }
+.page-thumb:hover { -fx-opacity: 1; }
+.scrubber .track { -fx-background-color: -line; -fx-pref-height: 3; }
+.scrubber .thumb {
+    -fx-background-color: -acc;
+    -fx-pref-width: 8;
+    -fx-pref-height: 16;
+}
+.strip-bar { -fx-pref-width: 10; }
