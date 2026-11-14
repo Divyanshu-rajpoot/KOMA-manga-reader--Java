@@ -48,6 +48,24 @@ class FileNameParserTest {
             "scans.cbz                                                |                   | 0      |      | volume",
             "Salt.and.Static.v02.cbz                                  | Salt and Static   | 2      |      | volume",
             "Moonlit Court v3.CBZ                                     | Moonlit Court     | 3      |      | volume",
+            // name after the number
+            "Vol 3 - Paper Ronin.cbz                                  | Paper Ronin       | 3      |      | volume",
+            "v07 Paper Ronin.cbz                                      | Paper Ronin       | 7      |      | volume",
+            "Volume 12 Paper Ronin (Digital).cbz                      | Paper Ronin       | 12     |      | volume",
+            "Vol. 1-3 Quiet Blade.cbz                                 | Quiet Blade       | 1      | 3    | omnibus",
+            "Vol 2 - Ch 10 - Tidebreaker.cbz                          | Tidebreaker       | 2      |      | volume",
+            "Ch 12 - Tidebreaker.cbz                                  | Tidebreaker       | 12     |      | chapter",
+            "Chapter 101 Solo Leveling.cbz                            | Solo Leveling     | 101    |      | chapter",
+            "[Scans] c012 Tidebreaker.cbz                             | Tidebreaker       | 12     |      | chapter",
+            "Episode 7_Tower_of_God.cbz                               | Tower of God      | 7      |      | chapter",
+            "Ch.12.5.Tidebreaker.cbz                                  | Tidebreaker       | 12.5   |      | chapter",
+            "012 - Tower of God.cbz                                   | Tower of God      | 12     |      | volume",
+            "07. Ember Ward.cbz                                       | Ember Ward        | 7      |      | volume",
+            "#4 Crow Season.cbz                                       | Crow Season       | 4      |      | volume",
+            "03 Crow Season.cbz                                       | Crow Season       | 3      |      | volume",
+            "1 Punch Man.cbz                                          |                   | 0      |      | volume",
+            "Chapter 12.cbz                                           |                   | 0      |      | volume",
+            "2019 - Steel Koi.cbz                                     |                   | 0      |      | volume",
     })
     void parses(String file, String series, double number, Double end, String kind) {
         FileNameParser.Parsed p = FileNameParser.parse(file);

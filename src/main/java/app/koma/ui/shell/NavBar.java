@@ -3,6 +3,7 @@ package app.koma.ui.shell;
 import app.koma.AppContext;
 import app.koma.ui.library.LibraryView;
 import app.koma.ui.shared.Icons;
+import app.koma.ui.shared.LogoMark;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -35,10 +36,7 @@ public final class NavBar extends HBox {
         setAlignment(Pos.CENTER_LEFT);
 
         // logo: red square with コ + KOMA
-        Label ko = new Label("コ");
-        ko.getStyleClass().add("logo-mark");
-        StackPane mark = new StackPane(ko);
-        mark.getStyleClass().add("logo-box");
+        LogoMark mark = new LogoMark(28);
         Label word = new Label("KOMA");
         word.getStyleClass().add("logo-word");
         HBox logo = new HBox(8, mark, word);

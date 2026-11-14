@@ -1,6 +1,7 @@
 package app.koma.ui.shell;
 
 import app.koma.ui.shared.Icons;
+import app.koma.ui.shared.LogoMark;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,6 +20,7 @@ public final class TitleBar extends HBox {
     public TitleBar(Stage stage, MainWindow window) {
         getStyleClass().add("titlebar");
         setAlignment(Pos.CENTER_LEFT);
+        setSpacing(8);
         title.getStyleClass().add("titlebar-title");
 
         Region spacer = new Region();
@@ -32,7 +34,9 @@ public final class TitleBar extends HBox {
         close.getStyleClass().add("close");
         close.setOnAction(e -> stage.close());
 
-        getChildren().addAll(title, spacer, min, max, close);
+        LogoMark mark = new LogoMark(16);
+        mark.getStyleClass().add("titlebar-mark");
+        getChildren().addAll(mark, title, spacer, min, max, close);
 
         setOnMousePressed(e -> {
             dragDX = e.getScreenX() - stage.getX();

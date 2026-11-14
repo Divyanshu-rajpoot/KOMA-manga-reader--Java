@@ -89,7 +89,11 @@ Try in order; the first match wins:
 2. `{Series} v{NN}` / `{Series} Vol. {N}` / `{Series} Volume {N}`
 3. `{Series} {NN}-{NN}` (omnibus, covering a range of volumes)
 4. `{Series} c{NNN}` / `Ch {N}` (chapter files, mainly manhwa)
-5. Otherwise "unmatched": the user picks the series in the import queue.
+5. `{Series} {NN}` (bare trailing number), then `{NN} - {Series}` (bare leading number; needs a separator, `#` or zero padding)
+6. Otherwise "unmatched": the user picks the series in the import queue.
+
+The name can come before or after the number: `Vol 3 - {Series}`, `Ch 12 {Series}`, `012 - {Series}`.
+Text before the number wins; otherwise the text after it is used (a leading `Ch N` in it is skipped).
 
 Strip tags like `[Group]`, `(Digital)`, `(2019)` before matching. Unit-test the parser with at least 30 real-world-style names.
 

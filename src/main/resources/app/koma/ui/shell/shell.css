@@ -27,16 +27,10 @@
     -fx-background-color: -bg;
 }
 .logo { -fx-cursor: hand; }
-.logo-box {
-    -fx-background-color: -acc;
-    -fx-min-width: 28; -fx-pref-width: 28; -fx-max-width: 28;
-    -fx-min-height: 28; -fx-pref-height: 28; -fx-max-height: 28;
-}
-.logo-mark {
-    -fx-font-family: "Noto Sans JP";
-    -fx-font-size: 16px;
-    -fx-text-fill: -on-acc;
-}
+.logo-box { -fx-background-color: -acc; }
+.logo-box .glyph { -fx-background-color: -on-acc; }
+/* hard ink offset shadow, like the app icon */
+.logo .logo-box { -fx-effect: dropshadow(one-pass-box, -ink, 0, 0, 3, 3); }
 .logo-word {
     -fx-font-family: "Anton";
     -fx-font-size: 24px;

@@ -29,7 +29,9 @@ public final class Icons {
             Map.entry("folder", "M3 5h7l2 2h9v12H3z"),
             Map.entry("fullscreen", "M3 3h7v2H5v5H3zM14 3h7v7h-2V5h-5zM3 14h2v5h5v2H3zM19 14h2v7h-7v-2h5z"),
             Map.entry("grid", "M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"),
-            Map.entry("list", "M3 5h18v3H3zM3 10.5h18v3H3zM3 16h18v3H3z"));
+            Map.entry("list", "M3 5h18v3H3zM3 10.5h18v3H3zM3 16h18v3H3z"),
+            // KOMA brand mark: a bold katakana コ, same geometry as the app icon (packaging/IconGen.java)
+            Map.entry("koma", "M6 6h12v12H6v-3h9V9H6z"));
 
     private static final String FRAME = "M0 0h.01v.01H0z M23.99 23.99h.01v.01h-.01z ";
 
