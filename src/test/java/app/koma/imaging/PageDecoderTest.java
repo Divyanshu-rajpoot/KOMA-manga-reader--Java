@@ -63,6 +63,20 @@ class PageDecoderTest {
         assertEquals(25, out.getRGB(0, 0) & 0xFF);
     }
 
+    /** 3 px → 2 px: each output covers 1.5 source pixels, weighted by area. */
+    @Test
+    void areaAverageWeightsByCoverage() {
+        BufferedImage src = new BufferedImage(3, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+        src.setRGB(0, 0, gray(0));
+        src.setRGB(1, 0, gray(90));
+        src.setRGB(2, 0, gray(180));
+        BufferedImage out = PageDecoder.areaAverage(src, 2, 1);
+        // left = (1.0*0 + 0.5*90) / 1.5 = 30, right = (0.5*90 + 1.0*180) / 1.5 = 150
+        assertEquals(30, out.getRGB(0, 0) & 0xFF);
+        assertEquals(150, out.getRGB(1, 0) & 0xFF);
+        assertEquals(0xFF, out.getRGB(1, 0) >>> 24);
+    }
+
     @Test
     void resizeHitsExactTarget() {
         BufferedImage src = new BufferedImage(2000, 3000, BufferedImage.TYPE_3BYTE_BGR);

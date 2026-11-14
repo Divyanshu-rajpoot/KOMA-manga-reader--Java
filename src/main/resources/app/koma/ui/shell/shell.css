@@ -76,3 +76,5 @@
 .ink-button .glyph { -fx-background-color: -on-ink; }
 .outline-button .glyph, .icon-button .glyph { -fx-background-color: -text; }
 .glyph { -fx-background-color: -text; }
+
+.compact .navbar { -fx-padding: 10 28 10 28; }

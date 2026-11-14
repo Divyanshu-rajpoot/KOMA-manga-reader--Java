@@ -63,6 +63,7 @@ final class PagedView implements ReaderMode {
         scroll.setContent(stage);
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(state.fit == ReaderState.Fit.PAGE ? ScrollPane.ScrollBarPolicy.NEVER : ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.setPannable(true);
         scroll.viewportBoundsProperty().addListener((o, a, b) -> {
             stage.setMinHeight(b.getHeight());
@@ -167,6 +168,8 @@ final class PagedView implements ReaderMode {
 
     @Override
     public void relayout() {
+        // fit page: nothing to scroll (rounding could otherwise show a 1px scrollbar)
+        scroll.setVbarPolicy(state.fit == ReaderState.Fit.PAGE ? ScrollPane.ScrollBarPolicy.NEVER : ScrollPane.ScrollBarPolicy.AS_NEEDED);
         render(0);
     }
 
@@ -174,7 +177,8 @@ final class PagedView implements ReaderMode {
     private int[] box() {
         var vp = scroll.getViewportBounds();
         double scale = Math.max(1, stage.getScene() == null ? 1 : stage.getScene().getWindow().getOutputScaleX());
-        double pad = 28;
+        // normal: room for the 4px frame + 8px padding; full screen: edge to edge
+        double pad = state.immersive ? 0 : 20;
         double w = Math.max(200, vp.getWidth() - 2 * pad) / shown;
         double h = Math.max(200, vp.getHeight() - 2 * pad);
         if (state.fit == ReaderState.Fit.WIDTH) {

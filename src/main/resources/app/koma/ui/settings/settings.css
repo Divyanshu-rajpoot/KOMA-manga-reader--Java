@@ -1,9 +1,4 @@
 /* Settings */
-.page-title {
-    -fx-font-family: "Anton";
-    -fx-font-size: 64px;
-    -fx-text-fill: -text;
-}
 .settings-row {
     -fx-padding: 14 0 14 0;
     -fx-border-color: transparent transparent -line transparent;

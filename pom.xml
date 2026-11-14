@@ -6,7 +6,7 @@
 
     <groupId>app.koma</groupId>
     <artifactId>koma</artifactId>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
     <name>KOMA</name>
     <description>Offline manga and manhwa reader for local CBZ files</description>
 
@@ -142,6 +142,12 @@
                                               todir="${project.build.directory}/jpackage-input"/>
                                         <exec executable="${java.home}/bin/jpackage" failonerror="true">
                                             <arg line="--name KOMA --app-version ${project.version} --vendor KOMA"/>
+                                            <arg value="--description"/>
+                                            <arg value="Offline manga and manhwa reader for CBZ files"/>
+                                            <arg value="--copyright"/>
+                                            <arg value="Copyright (c) 2026 Divyraj. MIT License."/>
+                                            <arg value="--icon"/>
+                                            <arg value="${project.basedir}/packaging/koma.ico"/>
                                             <arg value="--input"/>
                                             <arg value="${project.build.directory}/jpackage-input"/>
                                             <arg line="--main-jar ${project.build.finalName}.jar --main-class ${main.class}"/>
@@ -153,6 +159,11 @@
                                             <arg value="--java-options"/>
                                             <arg value="-Xmx2g -Dfile.encoding=UTF-8"/>
                                         </exec>
+                                        <!-- release zip of the portable app (skipped for msi/exe builds) -->
+                                        <zip destfile="${project.build.directory}/release/KOMA-${project.version}-windows-x64.zip" whenempty="skip">
+                                            <zipfileset dir="${project.build.directory}/installer" includes="KOMA/**"/>
+                                            <zipfileset file="${project.basedir}/LICENSE" prefix="KOMA"/>
+                                        </zip>
                                     </target>
                                 </configuration>
                             </execution>

@@ -33,6 +33,7 @@ public final class MainWindow {
     private final NavBar nav;
     private final StackPane toastLayer = new StackPane();
     private boolean maximized;
+    private boolean startMaximized;
     private Rectangle2D restoreBounds;
 
     public MainWindow(AppContext ctx, boolean systemDark) {
@@ -41,6 +42,10 @@ public final class MainWindow {
         ctx.window = this;
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setTitle("KOMA");
+        for (int size : new int[]{16, 32, 64, 128, 256}) {
+            var url = MainWindow.class.getResource("/app/koma/icon/koma-" + size + ".png");
+            if (url != null) stage.getIcons().add(new javafx.scene.image.Image(url.toExternalForm()));
+        }
         stage.setMinWidth(980);
         stage.setMinHeight(640);
 
@@ -75,15 +80,37 @@ public final class MainWindow {
             stage.setTitle("KOMA · " + (title != null ? title : screen.title));
         });
 
+        // Esc is handled by us (the reader leaves full-screen reading first); the title bar hides in full screen
+        stage.setFullScreenExitHint("");
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        stage.fullScreenProperty().addListener((o, was, fs) -> {
+            titleBar.setVisible(!fs);
+            titleBar.setManaged(!fs);
+        });
+
         installDragAndDrop(scene);
         installShortcuts(scene);
         new WindowResizer(stage, this).install(scene);
+        // compact mode: smaller display type and spacing on small windows (e.g. 1280x800 laptops)
+        javafx.beans.InvalidationListener compact = o -> {
+            boolean c = scene.getWidth() < 1480 || scene.getHeight() < 920;
+            if (c != root.getStyleClass().contains("compact")) {
+                if (c) root.getStyleClass().add("compact");
+                else root.getStyleClass().remove("compact");
+            }
+        };
+        scene.widthProperty().addListener(compact);
+        scene.heightProperty().addListener(compact);
+        compact.invalidated(null);
+
         stage.setScene(scene);
         stage.centerOnScreen();
+        startMaximized = vb.getWidth() < 1600 || vb.getHeight() < 1000;
     }
 
     public void show() {
         stage.show();
+        if (startMaximized) toggleMaximize();
         stage.getScene().getRoot().requestFocus(); // don't start with the cursor in the search box
     }
 
@@ -117,10 +144,11 @@ public final class MainWindow {
     }
 
     public void toggleFullScreen() {
-        stage.setFullScreenExitHint("");
-        stage.setFullScreen(!stage.isFullScreen());
-        titleBar.setVisible(!stage.isFullScreen());
-        titleBar.setManaged(!stage.isFullScreen());
+        setFullScreen(!stage.isFullScreen());
+    }
+
+    public void setFullScreen(boolean on) {
+        stage.setFullScreen(on);
     }
 
     public void toast(String message) {
@@ -176,6 +204,9 @@ public final class MainWindow {
         acc.put(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.SHORTCUT_DOWN),
                 () -> ctx.router.navigate(app.koma.ui.shell.Screen.SETTINGS, null));
         acc.put(new KeyCodeCombination(KeyCode.F11), this::toggleFullScreen);
+        acc.put(new KeyCodeCombination(KeyCode.ESCAPE), () -> {
+            if (stage.isFullScreen()) setFullScreen(false);
+        });
         acc.put(new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN), ctx.router::back);
     }
 }

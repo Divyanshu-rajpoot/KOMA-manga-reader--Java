@@ -1,5 +1,6 @@
 /* Home */
 .top-band {
+    -fx-min-height: 420px;
     -fx-border-color: -ink transparent -ink transparent;
     -fx-border-width: 3 0 3 0;
 }
@@ -40,3 +41,7 @@
 }
 .card-rule { -fx-background-color: -ink; -fx-min-height: 2; -fx-pref-height: 2; -fx-max-height: 2; }
 .reading-card .stamp { -fx-background-color: -panel2; }
+
+/* compact (small windows) */
+.compact .top-band { -fx-min-height: 340px; }
+.compact .drop-big { -fx-font-size: 36px; }

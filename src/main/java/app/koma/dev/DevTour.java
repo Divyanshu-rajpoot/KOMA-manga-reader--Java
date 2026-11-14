@@ -75,8 +75,8 @@ public final class DevTour {
             });
             step(2.5, () -> shot("02-import-added"));
         }
-        step(0.5, () -> openFirst("paper-ronin"));
-        step(2.0, () -> shot("03-reader-single"));
+        step(0.5, () -> openFirst(paged()));
+        step(2.5, () -> shot("03-reader-single"));
         step(0.1, () -> key(KeyCode.LEFT));
         step(0.1, () -> key(KeyCode.LEFT));
         step(0.1, () -> key(KeyCode.LEFT));
@@ -84,8 +84,11 @@ public final class DevTour {
         step(1.5, () -> shot("04-reader-spread"));
         step(0.1, () -> key(KeyCode.LEFT));
         step(1.0, () -> shot("05-reader-spread-next"));
+        step(0.1, () -> key(KeyCode.F));
+        step(2.5, () -> shot("05b-reader-fullscreen"));
+        step(0.1, () -> key(KeyCode.ESCAPE));
         step(0.1, () -> ctx.router.back());
-        step(0.5, () -> openFirst("tidebreaker"));
+        step(0.5, () -> openFirst(strip()));
         step(2.0, () -> shot("06-reader-strip"));
         step(0.1, () -> key(KeyCode.PAGE_DOWN));
         step(0.1, () -> key(KeyCode.PAGE_DOWN));
@@ -94,7 +97,7 @@ public final class DevTour {
         step(2.5, () -> shot("08-home-light"));
         step(0.1, () -> ctx.router.navigate(Screen.LIBRARY, null));
         step(1.5, () -> shot("09-library-light"));
-        step(0.1, () -> ctx.router.navigate(Screen.SERIES, "paper-ronin"));
+        step(0.1, () -> ctx.router.navigate(Screen.SERIES, paged()));
         step(1.5, () -> shot("10-series-light"));
         step(0.1, () -> ctx.router.navigate(Screen.SETTINGS, null));
         step(1.0, () -> shot("11-settings-light"));
@@ -103,10 +106,25 @@ public final class DevTour {
             ctx.router.navigate(Screen.HOME, null);
         });
         step(2.5, () -> shot("12-home-dark"));
+        step(0.1, this::scrollToBottom);
+        step(1.0, () -> shot("12b-home-dark-bottom"));
         step(0.1, () -> ctx.router.navigate(Screen.LIBRARY, null));
         step(1.5, () -> shot("13-library-dark"));
-        step(0.1, () -> openFirst("paper-ronin"));
-        step(2.0, () -> shot("14-reader-dark"));
+        step(0.1, () -> ctx.router.navigate(Screen.SERIES, paged()));
+        step(1.5, () -> shot("13b-series-dark"));
+        step(0.1, () -> clickButton("RENAME"));
+        step(0.8, () -> shot("13b1-series-rename"));
+        step(0.1, () -> clickButton("CANCEL"));
+        step(0.1, () -> clickButton("REMOVE"));
+        step(0.5, () -> shot("13b1b-series-remove-confirm"));
+        step(0.1, this::scrollToBottom);
+        step(1.0, () -> shot("13b2-series-dark-bottom"));
+        step(0.1, () -> ctx.router.navigate(Screen.SETTINGS, null));
+        step(1.0, () -> shot("13c-settings-dark"));
+        step(0.1, this::scrollToBottom);
+        step(0.8, () -> shot("13c2-settings-dark-bottom"));
+        step(0.1, () -> openFirst(paged()));
+        step(2.5, () -> shot("14-reader-dark"));
         step(0.1, () -> ctx.router.navigate(Screen.IMPORT, null));
         step(1.0, () -> shot("15-import-dark"));
         step(0.1, () -> {
@@ -116,14 +134,36 @@ public final class DevTour {
         next();
     }
 
+    /** First paged (non long-strip) series, else the first series. */
+    private String paged() {
+        return ctx.store.series().stream().filter(x -> !"ttb".equals(x.direction)).findFirst()
+                .or(() -> ctx.store.series().stream().findFirst()).map(x -> x.id).orElse(null);
+    }
+
+    /** First long-strip series, else any. */
+    private String strip() {
+        return ctx.store.series().stream().filter(x -> "ttb".equals(x.direction)).findFirst()
+                .or(() -> ctx.store.series().stream().findFirst()).map(x -> x.id).orElse(null);
+    }
+
     private void openFirst(String seriesId) {
-        Series s = ctx.store.findSeries(seriesId);
+        Series s = seriesId == null ? null : ctx.store.findSeries(seriesId);
         if (s == null) {
             System.err.println("DevTour: no series " + seriesId);
             return;
         }
         Volume v = s.sortedVolumes().stream().min(Comparator.comparingDouble(x -> x.number)).orElseThrow();
         ctx.router.navigate(Screen.READER, v.id);
+    }
+
+    private void clickButton(String text) {
+        ctx.stage.getScene().getRoot().lookupAll(".button").stream()
+                .filter(n -> n instanceof javafx.scene.control.Button b && text.equals(b.getText()))
+                .findFirst().ifPresent(n -> ((javafx.scene.control.Button) n).fire());
+    }
+
+    private void scrollToBottom() {
+        if (ctx.router.currentView().root() instanceof javafx.scene.control.ScrollPane sp) sp.setVvalue(1);
     }
 
     private void key(KeyCode code) {

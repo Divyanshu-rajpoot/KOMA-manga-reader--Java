@@ -132,7 +132,9 @@ final class ImportRow extends HBox {
             case ADDED -> match.setText(item.series + "  →  " + numberText() + "   ✓ added");
         }
         if (!seriesField.isFocused() && item.series != null) seriesField.setText(item.series);
-        if (!numberField.isFocused() && item.state != State.QUEUED) numberField.setText(Volume.num(item.number));
+        if (!numberField.isFocused() && item.state != State.QUEUED) {
+            numberField.setText(item.state == State.UNMATCHED && item.number == 0 ? "" : Volume.num(item.number));
+        }
 
         double p = switch (item.state) {
             case QUEUED -> 0.05;

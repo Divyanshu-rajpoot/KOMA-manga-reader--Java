@@ -84,7 +84,11 @@ final class ReadingCard extends VBox {
             rows.add(mono(Math.abs(ss.to - ss.from) + " pp"), 2, r);
             r++;
         }
-        if (r == 0) rows.add(mono("No sessions yet. Open a volume to start."), 0, 0, 3, 1);
+        if (r == 0) {
+            Label none = mono("No sessions yet. Open a volume to start.");
+            none.setWrapText(true);
+            rows.add(none, 0, 0, 3, 1);
+        }
         front.getChildren().add(rows);
 
         if (v == null || !v.isStarted()) stamp.setText("NOT STARTED");

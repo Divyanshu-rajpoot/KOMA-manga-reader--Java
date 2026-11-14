@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +26,8 @@ import java.util.stream.Stream;
  */
 public final class ThumbCache {
     public static final int WIDTH = 360;
+    /** Bump when decoding changes so stale thumbnails are rebuilt (v2: fixed red/blue swap from the box resize). */
+    private static final int VERSION = 2;
 
     private final Path dir;
     private final PageCache mem = new PageCache(160L << 20);
@@ -39,10 +40,27 @@ public final class ThumbCache {
     public static String key(String path, long size, long mtime) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
-            byte[] h = md.digest((path.toLowerCase() + "|" + size + "|" + mtime).getBytes(StandardCharsets.UTF_8));
+            byte[] h = md.digest(("v" + VERSION + "|" + path.toLowerCase() + "|" + size + "|" + mtime).getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(h);
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Deletes KOMA's thumbnails from older cache versions (only our top-level *.jpg files).
+     * Call once at startup, off the FX thread and before any cover is requested.
+     */
+    public static void purgeOldVersions(Path dir) {
+        Path marker = dir.resolve("koma-thumbs.version");
+        try {
+            if (Files.isRegularFile(marker) && Files.readString(marker).trim().equals(String.valueOf(VERSION))) return;
+            try (Stream<Path> s = Files.list(dir)) {
+                s.filter(p -> p.getFileName().toString().matches("[0-9a-f]{40}\\.jpg")).forEach(p -> p.toFile().delete());
+            }
+            Files.writeString(marker, String.valueOf(VERSION));
+        } catch (IOException e) {
+            System.err.println("KOMA: thumbnail cache cleanup failed: " + e.getMessage());
         }
     }
 
@@ -55,33 +73,32 @@ public final class ThumbCache {
         Image hit = mem.get(k);
         if (hit != null) return CompletableFuture.completedFuture(hit);
         return inflight.computeIfAbsent(k, kk -> {
+            Path file = dir.resolve(kk + ".jpg");
+            // disk work on an I/O thread, decoding on the bounded decode pool (opening a library
+            // shouldn't decode dozens of covers at once on unbounded threads)
             CompletableFuture<Image> f = Exec.io(() -> {
-                Path file = dir.resolve(kk + ".jpg");
                 try {
-                    if (Files.isRegularFile(file)) {
-                        try (InputStream in = Files.newInputStream(file)) {
-                            Image img = new Image(in);
-                            if (!img.isError()) {
-                                mem.put(kk, img);
-                                return img;
-                            }
-                        }
-                    }
-                    byte[] first;
+                    if (Files.isRegularFile(file)) return Files.readAllBytes(file);
                     try (CbzIndex idx = CbzIndex.open(Path.of(path))) {
                         if (idx.pageCount() == 0) throw new IOException("No images in archive");
-                        first = idx.readPage(0);
+                        return idx.readPage(0);
                     }
-                    BufferedImage bi = PageDecoder.decodeBuffered(first, WIDTH, 0);
+                } catch (IOException e) {
+                    throw new CompletionException(e);
+                }
+            }).thenApplyAsync(bytes -> {
+                try {
+                    boolean cached = Files.isRegularFile(file);
+                    BufferedImage bi = PageDecoder.decodeBuffered(bytes, WIDTH, 0);
                     if (bi == null) throw new IOException("Unsupported cover image");
-                    writeJpeg(bi, file);
+                    if (!cached) writeJpeg(bi, file);
                     Image img = PageDecoder.toFx(bi);
                     mem.put(kk, img);
                     return img;
                 } catch (IOException e) {
                     throw new CompletionException(e);
                 }
-            });
+            }, Exec.DECODE);
             f.whenComplete((r, e) -> inflight.remove(kk));
             return f;
         });
@@ -96,7 +113,16 @@ public final class ThumbCache {
         g.dispose();
         Files.createDirectories(file.getParent());
         Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
-        ImageIO.write(rgb, "jpg", tmp.toFile());
+        var writer = ImageIO.getImageWritersByFormatName("jpg").next();
+        var param = writer.getDefaultWriteParam();
+        param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(0.92f);
+        try (var out = ImageIO.createImageOutputStream(tmp.toFile())) {
+            writer.setOutput(out);
+            writer.write(null, new javax.imageio.IIOImage(rgb, null, null), param);
+        } finally {
+            writer.dispose();
+        }
         Files.move(tmp, file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
     }
 

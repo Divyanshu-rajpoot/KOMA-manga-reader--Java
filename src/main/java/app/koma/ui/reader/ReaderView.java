@@ -9,7 +9,6 @@ import app.koma.library.Volume;
 import app.koma.ui.shared.Css;
 import app.koma.ui.shared.Fmt;
 import app.koma.ui.shared.Icons;
-import app.koma.ui.shared.SpeedBurst;
 import app.koma.ui.shell.Screen;
 import app.koma.ui.shell.View;
 import javafx.animation.PauseTransition;
@@ -69,6 +68,13 @@ public final class ReaderView implements View {
     private int page;
     private boolean disposed;
     private boolean chromeHidden;
+    /** Full-screen reading: no title bar, no frame, controls appear as overlays near the screen edges. */
+    private boolean immersive;
+    private final VBox overlayTop = new VBox();
+    private final VBox overlayBottom = new VBox();
+    private final PauseTransition hideOverlays = new PauseTransition(Duration.millis(1600));
+    private final PauseTransition hideCursor = new PauseTransition(Duration.millis(2200));
+    private javafx.beans.value.ChangeListener<Boolean> fullScreenListener;
     private EventHandler<KeyEvent> keys;
 
     public ReaderView(AppContext ctx, String volumeId) {
@@ -77,8 +83,19 @@ public final class ReaderView implements View {
         this.series = volume == null ? null : ctx.store.seriesOf(volume);
         root.getStyleClass().add("reader");
         Css.add(root, ReaderView.class, "reader");
-        root.getChildren().add(new SpeedBurst(0.07));
-        root.getChildren().add(layout);
+        // overlays hold the top bar and thumbnail strip while reading full screen
+        for (VBox o : List.of(overlayTop, overlayBottom)) {
+            o.getStyleClass().add("reader-overlay");
+            o.setMaxHeight(Region.USE_PREF_SIZE);
+            o.setVisible(false);
+        }
+        StackPane.setAlignment(overlayTop, Pos.TOP_CENTER);
+        StackPane.setAlignment(overlayBottom, Pos.BOTTOM_CENTER);
+        root.getChildren().addAll(layout, overlayTop, overlayBottom);
+        hideOverlays.setOnFinished(e -> showOverlays(false));
+        hideCursor.setOnFinished(e -> {
+            if (immersive) root.setCursor(javafx.scene.Cursor.NONE);
+        });
 
         if (volume == null || series == null) {
             fail("This volume is no longer in your library.");
@@ -137,8 +154,8 @@ public final class ReaderView implements View {
         if (volume.pages != idx.pageCount()) volume.pages = idx.pageCount();
         page = Math.min(page, idx.pageCount() - 1);
         strip = new ThumbStrip(loader, state.rtl && state.mode != ReaderState.Mode.STRIP, p -> mode.go(p, true));
-        layout.setBottom(strip);
         BorderPane.setMargin(strip, new Insets(6, 22, 12, 22));
+        placeChrome();
         buildMode();
         syncButtons();
     }
@@ -236,8 +253,8 @@ public final class ReaderView implements View {
         ToggleGroup fits = new ToggleGroup();
         fitB.setToggleGroup(fits);
         widthB.setToggleGroup(fits);
-        fitB.setTooltip(new Tooltip("Fit page to window"));
-        widthB.setTooltip(new Tooltip("Fit width (scroll)"));
+        fitB.setTooltip(new Tooltip("Fit page to window (Z)"));
+        widthB.setTooltip(new Tooltip("Fit width, scroll down the page (Z)"));
         fitB.setOnAction(e -> setFit(ReaderState.Fit.PAGE));
         widthB.setOnAction(e -> setFit(ReaderState.Fit.WIDTH));
         dirB.getStyleClass().add("reader-button");
@@ -253,8 +270,8 @@ public final class ReaderView implements View {
         Button full = new Button();
         full.setGraphic(Icons.of("fullscreen", 14));
         full.getStyleClass().add("reader-button");
-        full.setTooltip(new Tooltip("Full screen (F11)"));
-        full.setOnAction(e -> ctx.window.toggleFullScreen());
+        full.setTooltip(new Tooltip("Full screen (F or F11, or double-click the page)"));
+        full.setOnAction(e -> toggleImmersive());
         Button more = new Button();
         more.setGraphic(Icons.of("more", 16));
         more.getStyleClass().add("reader-button");
@@ -289,7 +306,7 @@ public final class ReaderView implements View {
             ctx.theme.toggle();
             ctx.window.nav().updateThemeIcon();
         });
-        MenuItem help = new MenuItem("Shortcuts: ← → Space PgUp/PgDn Home End · 1 2 3 modes · F fit · Tab hide bars · F11 · Esc");
+        MenuItem help = new MenuItem("Shortcuts: ← → Space PgUp/PgDn Home End · 1 2 3 modes · F full screen · Z fit · Tab bars · Esc");
         help.setDisable(true);
         return new ContextMenu(read, open, prev, next, theme, help);
     }
@@ -313,8 +330,8 @@ public final class ReaderView implements View {
     private void rebuildStrip() {
         if (loader == null) return;
         strip = new ThumbStrip(loader, state.rtl && state.mode != ReaderState.Mode.STRIP, p -> mode.go(p, true));
-        layout.setBottom(chromeHidden ? null : strip);
         BorderPane.setMargin(strip, new Insets(6, 22, 12, 22));
+        placeChrome();
         strip.setPage(page, null);
     }
 
@@ -335,10 +352,59 @@ public final class ReaderView implements View {
     }
 
     private void toggleChrome() {
+        if (immersive) {
+            showOverlays(!overlayTop.isVisible());
+            return;
+        }
         chromeHidden = !chromeHidden;
-        layout.setTop(chromeHidden ? null : top);
-        layout.setBottom(chromeHidden ? null : strip);
+        placeChrome();
+    }
+
+    /** Puts the top bar and thumbnail strip inline (normal) or into the overlays (full screen). */
+    private void placeChrome() {
+        // detach first: a node can only have one parent
+        layout.setTop(null);
+        layout.setBottom(null);
+        overlayTop.getChildren().clear();
+        overlayBottom.getChildren().clear();
+        if (immersive) {
+            overlayTop.getChildren().add(top);
+            if (strip != null) overlayBottom.getChildren().add(strip);
+        } else if (!chromeHidden) {
+            layout.setTop(top);
+            if (strip != null) layout.setBottom(strip);
+        }
+        showOverlays(false);
         if (mode != null) resizeLater.playFromStart();
+    }
+
+    private void showOverlays(boolean show) {
+        boolean visible = show && immersive;
+        overlayTop.setVisible(visible);
+        overlayBottom.setVisible(visible);
+    }
+
+    private void toggleImmersive() {
+        setImmersive(!immersive);
+    }
+
+    private void setImmersive(boolean on) {
+        if (immersive == on) return;
+        immersive = on;
+        state.immersive = on;
+        if (on) {
+            root.getStyleClass().add("immersive");
+        } else {
+            root.getStyleClass().remove("immersive");
+            root.setCursor(null);
+            hideCursor.stop();
+        }
+        if (ctx.stage.isFullScreen() != on) ctx.window.setFullScreen(on);
+        placeChrome();
+        if (on) {
+            ctx.window.toast("Full screen · move the mouse to the top or bottom for controls · Esc or F to exit");
+            hideCursor.playFromStart();
+        }
     }
 
     private void fail(String message) {
@@ -370,16 +436,45 @@ public final class ReaderView implements View {
         };
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keys);
         root.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.MIDDLE) toggleChrome();
+            if (e.getButton() == MouseButton.MIDDLE) {
+                toggleChrome();
+            } else if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+                // double-click the middle of the page (the outer thirds turn pages)
+                double x = e.getX() / root.getWidth();
+                if (state.mode == ReaderState.Mode.STRIP || (x > 1 / 3.0 && x < 2 / 3.0)) toggleImmersive();
+            }
         });
+        // full screen: controls appear near the top/bottom edge; the cursor hides when idle
+        root.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_MOVED, e -> {
+            if (!immersive) return;
+            root.setCursor(null);
+            hideCursor.playFromStart();
+            boolean nearEdge = e.getY() < 110 || e.getY() > root.getHeight() - 150;
+            if (nearEdge) {
+                showOverlays(true);
+                hideOverlays.stop();
+            } else if (overlayTop.isVisible()) {
+                hideOverlays.playFromStart();
+            }
+        });
+        // leaving full screen any other way also leaves full-screen reading
+        fullScreenListener = (o, was, now) -> {
+            if (!now && immersive) setImmersive(false);
+        };
+        ctx.stage.fullScreenProperty().addListener(fullScreenListener);
         root.requestFocus();
     }
 
     private boolean handleKey(KeyEvent e) {
         KeyCode k = e.getCode();
         if (k == KeyCode.ESCAPE) {
-            if (ctx.stage.isFullScreen()) ctx.window.toggleFullScreen();
+            if (immersive) setImmersive(false);
+            else if (ctx.stage.isFullScreen()) ctx.window.setFullScreen(false);
             else ctx.router.back();
+            return true;
+        }
+        if (k == KeyCode.F11 || (k == KeyCode.F && !e.isShortcutDown() && !e.isAltDown())) {
+            toggleImmersive();
             return true;
         }
         if (mode == null) return false;
@@ -393,7 +488,7 @@ public final class ReaderView implements View {
             case DIGIT1, NUMPAD1 -> setMode(ReaderState.Mode.SPREAD);
             case DIGIT2, NUMPAD2 -> setMode(ReaderState.Mode.SINGLE);
             case DIGIT3, NUMPAD3 -> setMode(ReaderState.Mode.STRIP);
-            case F -> setFit(state.fit == ReaderState.Fit.PAGE ? ReaderState.Fit.WIDTH : ReaderState.Fit.PAGE);
+            case Z -> setFit(state.fit == ReaderState.Fit.PAGE ? ReaderState.Fit.WIDTH : ReaderState.Fit.PAGE);
             case TAB -> toggleChrome();
             default -> {
                 return mode.onKey(e);
@@ -408,6 +503,9 @@ public final class ReaderView implements View {
         disposed = true;
         saveLater.stop();
         resizeLater.stop();
+        hideOverlays.stop();
+        hideCursor.stop();
+        if (fullScreenListener != null) ctx.stage.fullScreenProperty().removeListener(fullScreenListener);
         if (keys != null && root.getScene() != null) root.getScene().removeEventFilter(KeyEvent.KEY_PRESSED, keys);
         if (volume != null && loader != null) {
             ctx.store.addSession(volume, startPage, page);
@@ -415,7 +513,7 @@ public final class ReaderView implements View {
         }
         if (mode != null) mode.dispose();
         if (loader != null) loader.close();
-        if (ctx.stage.isFullScreen()) ctx.window.toggleFullScreen();
+        if (ctx.stage.isFullScreen()) ctx.window.setFullScreen(false);
     }
 
     @Override

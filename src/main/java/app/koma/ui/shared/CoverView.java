@@ -33,6 +33,7 @@ public class CoverView extends Region {
     private final ImageView image = new ImageView();
     private final Label badge = new Label();
     private final Region frame = new Region();
+    private long titleSize = -1;
 
     public CoverView(AppContext ctx, Series s, Volume v, double prefWidth) {
         getStyleClass().add("cover");
@@ -131,8 +132,11 @@ public class CoverView extends Region {
         double pad = Math.max(6, w * 0.07);
         double jw = jpBox.prefWidth(-1), jh = Math.min(h * 0.6, jpBox.prefHeight(-1));
         jpBox.resizeRelocate(w - pad - jw, pad, jw, jh);
-        double fs = Math.max(10, w * 0.12);
-        title.setStyle("-fx-font-size: " + Math.round(fs) + "px;");
+        long fs = Math.round(Math.max(10, w * 0.12));
+        if (fs != titleSize) { // setStyle re-applies CSS, so only when the size actually changes
+            titleSize = fs;
+            title.setStyle("-fx-font-size: " + fs + "px;");
+        }
         double th = title.prefHeight(w - 2 * pad);
         title.resizeRelocate(pad, h - pad - th - 14, w - 2 * pad, th);
         kind.resizeRelocate(pad, h - pad - 12, w - 2 * pad, 12);

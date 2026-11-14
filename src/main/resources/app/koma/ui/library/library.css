@@ -1,9 +1,4 @@
 /* Library */
-.page-title {
-    -fx-font-family: "Anton";
-    -fx-font-size: 64px;
-    -fx-text-fill: -text;
-}
 .tile-title {
     -fx-font-family: "Anton";
     -fx-font-size: 18px;

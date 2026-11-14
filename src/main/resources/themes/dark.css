@@ -12,6 +12,8 @@
     -on-acc: #FFFFFF;
     -line: rgba(237, 232, 221, 0.18);
     -reader-bg: #0D0C0B;
+    -reader-overlay: rgba(13, 12, 11, 0.92);
+    -fullscreen-bg: #000000;
     -titlebar: #0B0A09;
     -on-titlebar: #EDE8DD;
     -cover-grey: #3A3733;

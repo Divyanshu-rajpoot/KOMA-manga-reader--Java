@@ -89,8 +89,12 @@ public final class PageDecoder {
                 int tw = Math.max(1, (int) Math.round(sw * scale));
                 int th = Math.max(1, (int) Math.round(sh * scale));
                 ImageReadParam p = r.getDefaultReadParam();
-                int sub = Math.max(1, sw / (tw * 2)); // keep at least 2x for a clean final downscale
-                if (sub > 1) p.setSourceSubsampling(sub, sub, 0, 0);
+                // Subsampling skips pixels (aliasing on line art and screentone), so it's only used for
+                // big reductions such as thumbnails, and always leaves 2x headroom for the averaging resize.
+                if (sw >= tw * 4) {
+                    int sub = sw / (tw * 2);
+                    p.setSourceSubsampling(sub, sub, 0, 0);
+                }
                 BufferedImage src = r.read(0, p);
                 return resize(src, tw, th);
             } finally {
@@ -107,9 +111,9 @@ public final class PageDecoder {
     }
 
     /**
-     * Halves with a 2x2 box average (reads the raster directly: fast, and averaging keeps screentone
-     * from turning into moiré), then a final bilinear step (the remaining scale is always ≥ 0.5).
-     * Output is INT_ARGB_PRE.
+     * High-quality downscale: 2x2 box halving while the image is at least twice the target, then an exact
+     * area-average step. Every source pixel contributes by the area it covers, so line art stays crisp and
+     * screentone doesn't turn into moiré (plain bilinear at ~0.5x skips pixels). Output is INT_ARGB_PRE.
      */
     static BufferedImage resize(BufferedImage src, int tw, int th) {
         BufferedImage cur = src;
@@ -119,10 +123,94 @@ public final class PageDecoder {
             w = cur.getWidth();
             h = cur.getHeight();
         }
-        if (w != tw || h != th || cur.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
-            cur = draw(cur, tw, th, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        if (cur.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
+            cur = draw(cur, w, h, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR); // 1:1 type conversion
         }
+        if (w != tw || h != th) cur = areaAverage(cur, tw, th);
         return cur;
+    }
+
+    /** Separable area-average resample of an INT_ARGB_PRE image to exactly tw x th (downscale only). */
+    static BufferedImage areaAverage(BufferedImage src, int tw, int th) {
+        int sw = src.getWidth(), sh = src.getHeight();
+        int[] s = ((DataBufferInt) src.getRaster().getDataBuffer()).getData();
+        int stride = ((java.awt.image.SinglePixelPackedSampleModel) src.getSampleModel()).getScanlineStride();
+        Taps hx = new Taps(sw, tw), vy = new Taps(sh, th);
+
+        // horizontal pass: sw x sh → tw x sh, 4 float channels
+        float[] mid = new float[tw * sh * 4];
+        for (int y = 0; y < sh; y++) {
+            int row = y * stride, m = y * tw * 4;
+            for (int x = 0; x < tw; x++) {
+                float a = 0, r = 0, g = 0, b = 0;
+                int start = hx.start[x], n = hx.len[x], wi = x * hx.max;
+                for (int k = 0; k < n; k++) {
+                    int p = s[row + start + k];
+                    float wt = hx.w[wi + k];
+                    a += (p >>> 24) * wt;
+                    r += ((p >> 16) & 0xFF) * wt;
+                    g += ((p >> 8) & 0xFF) * wt;
+                    b += (p & 0xFF) * wt;
+                }
+                int o = m + x * 4;
+                mid[o] = a;
+                mid[o + 1] = r;
+                mid[o + 2] = g;
+                mid[o + 3] = b;
+            }
+        }
+        // vertical pass: tw x sh → tw x th
+        BufferedImage out = new BufferedImage(tw, th, BufferedImage.TYPE_INT_ARGB_PRE);
+        int[] d = ((DataBufferInt) out.getRaster().getDataBuffer()).getData();
+        for (int y = 0; y < th; y++) {
+            int start = vy.start[y], n = vy.len[y], wi = y * vy.max;
+            for (int x = 0; x < tw; x++) {
+                float a = 0, r = 0, g = 0, b = 0;
+                for (int k = 0; k < n; k++) {
+                    int o = ((start + k) * tw + x) * 4;
+                    float wt = vy.w[wi + k];
+                    a += mid[o] * wt;
+                    r += mid[o + 1] * wt;
+                    g += mid[o + 2] * wt;
+                    b += mid[o + 3] * wt;
+                }
+                d[y * tw + x] = clamp(a) << 24 | clamp(r) << 16 | clamp(g) << 8 | clamp(b);
+            }
+        }
+        return out;
+    }
+
+    private static int clamp(float v) {
+        int i = Math.round(v);
+        return i < 0 ? 0 : Math.min(255, i);
+    }
+
+    /** For each output index: first source index, tap count, and area weights (summing to 1). */
+    private static final class Taps {
+        final int[] start, len;
+        final float[] w;
+        final int max;
+
+        Taps(int srcN, int dstN) {
+            double scale = (double) srcN / dstN;
+            max = (int) Math.ceil(scale) + 2;
+            start = new int[dstN];
+            len = new int[dstN];
+            w = new float[dstN * max];
+            for (int o = 0; o < dstN; o++) {
+                double a = o * scale, b = a + scale;
+                int i0 = (int) Math.floor(a), i1 = Math.min(srcN - 1, (int) Math.ceil(b) - 1);
+                start[o] = i0;
+                len[o] = i1 - i0 + 1;
+                double sum = 0;
+                for (int i = i0; i <= i1; i++) {
+                    double cover = Math.min(b, i + 1) - Math.max(a, i);
+                    w[o * max + (i - i0)] = (float) cover;
+                    sum += cover;
+                }
+                for (int k = 0; k < len[o]; k++) w[o * max + k] /= (float) sum;
+            }
+        }
     }
 
     /** 2x2 box downsample to INT_ARGB_PRE for opaque 8-bit sources; other types fall back to Java2D. */

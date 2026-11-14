@@ -94,7 +94,6 @@ public final class HomeView implements View {
             carousel.setPrefWidth(avail * 1.3 / 2.3);
             info.setMaxWidth(avail / 2.3);
         });
-        band.setMinHeight(420);
         return band;
     }
 

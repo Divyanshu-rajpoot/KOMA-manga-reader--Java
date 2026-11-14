@@ -33,6 +33,7 @@ public class App extends Application {
         systemReduce = WinPrefs.systemReduceMotion();
         ThemeManager.loadFonts();
         app.koma.imaging.PageDecoder.warmUp();
+        ThumbCache.purgeOldVersions(AppPaths.thumbsDir());
     }
 
     @Override

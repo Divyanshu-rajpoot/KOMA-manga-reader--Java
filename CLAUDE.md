@@ -17,7 +17,7 @@ Use the Maven wrapper (JDK 21 on PATH or `JAVA_HOME`; no global Maven needed):
 | Run | `mvnw javafx:run` |
 | Test | `mvnw test` |
 | 5 GB ZIP64 benchmark | `mvnw test -Phuge` |
-| Portable app (`target/installer/KOMA/KOMA.exe`) | `mvnw -Ppackage package` |
+| Portable app + release zip (`target/installer/KOMA/KOMA.exe`, `target/release/*.zip`) | `mvnw clean -Ppackage package` |
 | MSI installer (needs WiX Toolset 3) | `mvnw -Ppackage package -Djpackage.type=msi "-Djpackage.extra=--win-menu --win-shortcut"` |
 
 - `.mvn/jvm.config` makes Maven trust the Windows certificate store. This PC inspects HTTPS, and without it downloads fail with PKIX errors.
@@ -51,3 +51,6 @@ Decisions that differ from the original plan:
 - Cover thumbnails are **JPEG, not WebP**: TwelveMonkeys can read WebP but can't write it.
 - The 3D carousel uses a **per-card `PerspectiveTransform`** instead of a `SubScene`, so the cards get the theme CSS. The geometry is the same as in DESIGN.md.
 - Watched folders never import on their own: new files wait on the Import screen.
+- Reader full screen (`F`) is "immersive": the stage goes full screen, the frame disappears, and the bars become overlays that show near the screen edges.
+- Image quality: pages are decoded at the exact display size (no size bucketing) and downscaled with 2x box halving plus an exact area average (`PageDecoder.resize`). Subsampling during decode is only used for 4x+ reductions (thumbnails).
+- Thumbnail cache is versioned (`ThumbCache.VERSION`): bump it whenever decoding changes, and old thumbnails are purged at startup.

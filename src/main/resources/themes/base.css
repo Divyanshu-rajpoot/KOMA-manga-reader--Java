@@ -43,6 +43,7 @@
 .display-l { -fx-font-family: "Anton"; -fx-font-size: 58px; -fx-text-fill: -text; }
 .display-m { -fx-font-family: "Anton"; -fx-font-size: 40px; -fx-text-fill: -text; }
 .display-s { -fx-font-family: "Anton"; -fx-font-size: 22px; -fx-text-fill: -text; }
+.page-title { -fx-font-family: "Anton"; -fx-font-size: 64px; -fx-text-fill: -text; }
 .accent-text { -fx-text-fill: -acc; -fx-fill: -acc; }
 .muted { -fx-text-fill: -muted; }
 .mono {
@@ -103,6 +104,9 @@
     -fx-translate-y: -2;
     -fx-effect: dropshadow(one-pass-box, -acc, 0, 0, 5, 5);
 }
+/* a hard shadow copies the node's opaque pixels: an outline button needs a fill on hover,
+   or the shadow becomes a red ghost of its border and text */
+.outline-button:hover { -fx-background-color: -panel; }
 .accent-button:hover {
     -fx-translate-y: -2;
     -fx-effect: dropshadow(one-pass-box, -ink, 0, 0, 5, 5);
@@ -113,6 +117,13 @@
 }
 .ink-button .text, .accent-button .text { -fx-fill: inherit; }
 .button:disabled { -fx-opacity: 0.45; }
+.accent-button:disabled, .ink-button:disabled {
+    -fx-opacity: 1;
+    -fx-background-color: transparent;
+    -fx-border-color: -line;
+    -fx-text-fill: -muted;
+}
+.accent-button:disabled .glyph, .ink-button:disabled .glyph { -fx-background-color: -muted; }
 .small-button {
     -fx-min-height: 32px;
     -fx-pref-height: 32px;
@@ -354,3 +365,10 @@
 .koma-dialog .button {
     -fx-background-color: -ink; -fx-text-fill: -on-ink; -fx-background-radius: 0; -fx-padding: 8 16 8 16;
 }
+
+/* ---------- compact mode (window smaller than ~1480x920) ---------- */
+.compact .display-xl { -fx-font-size: 108px; }
+.compact .display-l { -fx-font-size: 44px; }
+.compact .display-m { -fx-font-size: 32px; }
+.compact .page-title { -fx-font-size: 48px; }
+.compact .empty-title { -fx-font-size: 32px; }

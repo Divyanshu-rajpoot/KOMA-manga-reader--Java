@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * drops stale preload work when the reader jumps.
  */
 public final class PageLoader implements AutoCloseable {
-    private static final int BUCKET = 32;
-
     private final CbzIndex index;
     private final PageCache cache;
     private final PageCache thumbCache;
@@ -44,8 +42,9 @@ public final class PageLoader implements AutoCloseable {
         return index.pageCount();
     }
 
+    /** Exact sizes: a page decoded even slightly larger than it's shown gets rescaled by the view and looks soft. */
     private static int bucket(int v) {
-        return v <= 0 ? 0 : ((v + BUCKET - 1) / BUCKET) * BUCKET;
+        return Math.max(0, v);
     }
 
     private String key(int page, int w, int h) {

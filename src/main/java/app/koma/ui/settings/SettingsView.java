@@ -48,6 +48,7 @@ public final class SettingsView implements View {
         title.getStyleClass().add("page-title");
         Label sub = new Label("Stored in " + ctx.store.file().getParent() + ". Nothing leaves this PC.");
         sub.getStyleClass().add("mono-s");
+        sub.setWrapText(true);
 
         page.getChildren().addAll(new VBox(0, title, sub), reading(), appearance(), performance(), library());
         scroll.setContent(page);
@@ -142,8 +143,7 @@ public final class SettingsView implements View {
     }
 
     private Node library() {
-        Label folder = new Label(st.libraryFolder);
-        folder.getStyleClass().add("mono");
+        Label folder = path(st.libraryFolder);
         Button change = new Button("Change");
         change.getStyleClass().addAll("outline-button", "small-button");
         change.setOnAction(e -> {
@@ -155,6 +155,7 @@ public final class SettingsView implements View {
             if (f != null) {
                 st.libraryFolder = f.getAbsolutePath();
                 folder.setText(st.libraryFolder);
+                folder.setTooltip(new javafx.scene.control.Tooltip(st.libraryFolder));
                 save();
             }
         });
@@ -168,7 +169,7 @@ public final class SettingsView implements View {
                         })),
                 row("Library folder", "Where \"Copy into KOMA library\" puts files: Series\\Vol NN.cbz", lib),
                 row("Watched folders", "New CBZ files that appear here wait on the Import screen.", watchList()),
-                row("Library file", "Your series, volumes and progress.", mono(ctx.store.file().toString())));
+                row("Library file", "Your series, volumes and progress.", path(ctx.store.file().toString())));
     }
 
     private Node watchList() {
@@ -185,7 +186,7 @@ public final class SettingsView implements View {
                     ctx.watched.restart();
                     rebuild[0].run();
                 });
-                HBox r = new HBox(8, mono(f), rm);
+                HBox r = new HBox(8, path(f), rm);
                 r.setAlignment(Pos.CENTER_LEFT);
                 box.getChildren().add(r);
             }
@@ -216,6 +217,19 @@ public final class SettingsView implements View {
         st.save();
     }
 
+    /** A file path: shows the end of long paths ("…\\KOMA Library") with the full path as a tooltip. */
+    private static Label path(String p) {
+        Label l = mono(p);
+        l.setTextOverrun(javafx.scene.control.OverrunStyle.LEADING_ELLIPSIS);
+        // fixed width: a Label's preferred width is its full text, which would push the page wider
+        l.setPrefWidth(340);
+        l.setMaxWidth(340);
+        l.setMinWidth(80);
+        l.setAlignment(Pos.CENTER_RIGHT);
+        l.setTooltip(new javafx.scene.control.Tooltip(p));
+        return l;
+    }
+
     private static Label mono(String t) {
         Label l = new Label(t);
         l.getStyleClass().add("mono");
@@ -243,7 +257,9 @@ public final class SettingsView implements View {
         h.setWrapText(true);
         VBox text = new VBox(2, l, h);
         text.setPrefWidth(420);
+        text.setMinWidth(280);
         HBox.setHgrow(text, Priority.ALWAYS);
+        if (control instanceof javafx.scene.layout.Region region) region.setMinWidth(Region.USE_PREF_SIZE);
         HBox r = new HBox(20, text, control);
         r.setAlignment(Pos.CENTER_LEFT);
         r.getStyleClass().add("settings-row");

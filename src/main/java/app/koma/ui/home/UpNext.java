@@ -58,9 +58,12 @@ final class UpNext extends VBox {
             CoverView c = new CoverView(ctx, s, v, 118);
             c.getStyleClass().add("hover-lift");
             c.setOnMouseClicked(e -> ctx.router.navigate(Screen.READER, v.id));
-            Label l = new Label("№" + v.label() + " · " + (v.isFinished() ? "READ" : v.isStarted() ? "OPEN" : "UNREAD"));
-            l.getStyleClass().addAll("mono", "strong");
-            VBox cell = new VBox(6, c, l);
+            Label name = new Label("VOL. " + v.label());
+            name.getStyleClass().addAll("mono", "strong");
+            Label l = new Label(v.isFinished() ? "READ" : v.isStarted() ? "IN PROGRESS" : "UNREAD");
+            l.getStyleClass().add("mono-s");
+            VBox cell = new VBox(4, c, name, l);
+            VBox.setMargin(name, new javafx.geometry.Insets(4, 0, 0, 0));
             cell.setMaxWidth(118);
             HBox.setHgrow(cell, Priority.ALWAYS);
             items.add(cell);

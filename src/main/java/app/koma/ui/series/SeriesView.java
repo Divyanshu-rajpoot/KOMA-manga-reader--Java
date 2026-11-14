@@ -23,7 +23,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TextField;
+import javafx.animation.PauseTransition;
+import javafx.scene.layout.StackPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
@@ -77,6 +79,8 @@ public final class SeriesView implements View {
         Label title = new Label(Fmt.upper(s.title));
         title.getStyleClass().add("display-l");
         title.setWrapText(true);
+        StackPane titleBox = new StackPane(title);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
         Label jp = new Label(s.titleJp == null ? "" : s.titleJp);
         jp.getStyleClass().addAll("jp", "series-jp");
         jp.setManaged(s.titleJp != null);
@@ -107,17 +111,30 @@ public final class SeriesView implements View {
         add.setOnAction(e -> ctx.window.nav().chooseFiles());
         Button rename = new Button("RENAME");
         rename.getStyleClass().add("outline-button");
-        rename.setOnAction(e -> rename());
+        rename.setOnAction(e -> rename(titleBox, title));
         Button remove = new Button("REMOVE");
         remove.getStyleClass().add("ghost-button");
+        // ask once before removing: the first click arms the button for 3 seconds
+        PauseTransition disarm = new PauseTransition(Duration.seconds(3));
+        disarm.setOnFinished(e -> {
+            remove.setText("REMOVE");
+            remove.getStyleClass().remove("danger");
+        });
         remove.setOnAction(e -> {
+            if (!remove.getStyleClass().contains("danger")) {
+                remove.setText("CLICK AGAIN TO REMOVE");
+                remove.getStyleClass().add("danger");
+                disarm.playFromStart();
+                return;
+            }
+            disarm.stop();
             ctx.store.removeSeries(s);
-            ctx.window.toast("Removed " + s.title + " from the library. Files were not deleted.");
+            ctx.window.toast("Removed " + s.title + " from the library. Your files were not deleted.");
             ctx.router.navigate(Screen.LIBRARY, null);
         });
         HBox actions = new HBox(12, resume, add, rename, remove);
 
-        VBox info = new VBox(8, kicker, title, jp, chips, stats, actions);
+        VBox info = new VBox(8, kicker, titleBox, jp, chips, stats, actions);
         VBox.setMargin(stats, new Insets(12, 0, 6, 0));
         HBox.setHgrow(info, Priority.ALWAYS);
         HBox head = new HBox(40, cover, info);
@@ -185,10 +202,13 @@ public final class SeriesView implements View {
             ThinProgress bar = new ThinProgress(4);
             bar.set(v.fraction());
             String state = v.isFinished() ? "READ" : v.isStarted()
-                    ? "p." + (v.progress.page + 1) + " / " + v.pages : "UNREAD · " + v.pages + " pp";
-            Label l = new Label((v.kind.equals("chapter") ? "CH " : "№") + v.label() + " · " + state);
+                    ? "P." + (v.progress.page + 1) + " / " + v.pages : "UNREAD · " + v.pages + " PP";
+            Label name = new Label((v.kind.equals("chapter") ? "CH. " : "VOL. ") + v.label());
+            name.getStyleClass().addAll("mono", "strong");
+            Label l = new Label(state);
             l.getStyleClass().add("mono-s");
-            VBox cell = new VBox(6, c, bar, l);
+            VBox cell = new VBox(6, c, bar, name, l);
+            VBox.setMargin(name, new javafx.geometry.Insets(2, 0, -4, 0));
             cell.setOnMouseClicked(e -> {
                 if (e.getButton() == MouseButton.PRIMARY) ctx.router.navigate(Screen.READER, v.id);
             });
@@ -234,20 +254,40 @@ public final class SeriesView implements View {
         return t;
     }
 
-    private void rename() {
-        TextInputDialog d = new TextInputDialog(s.title);
-        d.setTitle("Rename series");
-        d.setHeaderText(null);
-        d.setContentText("Series title:");
-        d.initOwner(ctx.stage);
-        d.getDialogPane().getStylesheets().setAll(ctx.stage.getScene().getStylesheets());
-        d.getDialogPane().getStyleClass().add("koma-dialog");
-        d.showAndWait().ifPresent(t -> {
-            if (!t.isBlank()) {
-                ctx.store.setSeriesMeta(s, t, null, null);
-                ctx.router.replace(Screen.SERIES, s.id);
+    /** Inline rename: the title turns into a text field (Enter saves, Esc cancels). */
+    private void rename(StackPane titleBox, Label title) {
+        TextField field = new TextField(s.title);
+        field.getStyleClass().add("rename-field");
+        HBox.setHgrow(field, Priority.ALWAYS);
+        Button save = new Button("SAVE");
+        save.getStyleClass().add("ink-button");
+        Button cancel = new Button("CANCEL");
+        cancel.getStyleClass().add("ghost-button");
+        HBox editor = new HBox(10, field, save, cancel);
+        editor.setAlignment(Pos.CENTER_LEFT);
+        editor.setMaxWidth(760);
+        Runnable close = () -> titleBox.getChildren().setAll(title);
+        Runnable commit = () -> {
+            String t = field.getText().trim();
+            if (t.isEmpty() || t.equals(s.title)) {
+                close.run();
+                return;
+            }
+            ctx.store.setSeriesMeta(s, t, null, null);
+            ctx.router.replace(Screen.SERIES, s.id);
+        };
+        save.setOnAction(e -> commit.run());
+        cancel.setOnAction(e -> close.run());
+        field.setOnAction(e -> commit.run());
+        field.setOnKeyPressed(e -> {
+            if (e.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
+                close.run();
+                e.consume();
             }
         });
+        titleBox.getChildren().setAll(editor);
+        field.requestFocus();
+        field.selectAll();
     }
 
     @Override

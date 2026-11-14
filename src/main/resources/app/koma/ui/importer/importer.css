@@ -1,9 +1,4 @@
 /* Import */
-.page-title {
-    -fx-font-family: "Anton";
-    -fx-font-size: 64px;
-    -fx-text-fill: -text;
-}
 .drop-zone { -fx-background-color: -panel; }
 .ants {
     -fx-fill: transparent;

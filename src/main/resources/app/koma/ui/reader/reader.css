@@ -1,6 +1,5 @@
 /* Reader: always on the reader background. */
 .reader { -fx-background-color: -reader-bg; }
-.reader .burst-ray { -fx-fill: -ink; }
 .reader-top { -fx-padding: 14 22 10 22; }
 .reader-title {
     -fx-font-family: "Anton";
@@ -68,3 +67,13 @@
     -fx-pref-height: 16;
 }
 .strip-bar { -fx-pref-width: 10; }
+
+/* full-screen reading: page edge to edge, controls as overlays near the screen edges */
+.reader.immersive { -fx-background-color: -fullscreen-bg; }
+.immersive .page-frame {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+.reader-overlay { -fx-background-color: -reader-overlay; }
