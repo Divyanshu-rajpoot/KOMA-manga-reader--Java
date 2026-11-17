@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.0.2 (2026-11-18)
 
 ### Reader
-- Zoom 100–400% in every mode: floating slider with − / + buttons (click the percentage to reset), `+` `-` `0` keys, Ctrl+wheel and trackpad pinch. Zoomed pages scroll and pan (drag, wheel, Shift+wheel in the long strip). The view resizes instantly and sharpens a moment later.
+- Zoom 25–400% in every mode (logarithmic slider, 100% in the middle): floating slider with − / + buttons (click the percentage to reset), `+` `-` `0` keys, Ctrl+wheel and trackpad pinch. Zoomed pages scroll and pan (drag, wheel, Shift+wheel in the long strip). The view resizes instantly and sharpens a moment later.
 
 ### Performance
 - Measured with the new frame-time harness (`-Dkoma.devperf=<series>`, see CLAUDE.md), 400 synthetic series, before → after: Library open froze the UI 1.1–1.4 s → about 0.1 s; scrolling 8–12 → about 55–60 fps; switching screens 7–10 → about 46 fps with worst stall 3.8 s → 0.3 s. With 1,500 series the old build ran out of memory; the new one runs.

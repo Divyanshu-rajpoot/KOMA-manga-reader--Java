@@ -6,7 +6,7 @@
 
     <groupId>app.koma</groupId>
     <artifactId>koma</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <name>KOMA</name>
     <description>Offline manga and manhwa reader for local CBZ files</description>
 
