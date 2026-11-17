@@ -43,6 +43,7 @@ final class PagedView implements ReaderMode {
     private int page;
     private int shown = 1;
     private int requestId;
+    private final javafx.animation.PauseTransition sharpen = new javafx.animation.PauseTransition(javafx.util.Duration.millis(180));
 
     PagedView(PageLoader loader, ReaderState state, IntConsumer onPage, Runnable onEndForward, Runnable onEndBackward) {
         this.loader = loader;
@@ -65,8 +66,10 @@ final class PagedView implements ReaderMode {
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(state.fit == ReaderState.Fit.PAGE ? ScrollPane.ScrollBarPolicy.NEVER : ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.setPannable(true);
+        sharpen.setOnFinished(e -> render(0));
         scroll.viewportBoundsProperty().addListener((o, a, b) -> {
             stage.setMinHeight(b.getHeight());
+            stage.setMinWidth(zoomed() ? b.getWidth() : 0);
             if (a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) relayout();
         });
         // click the outer thirds to turn pages (direction-aware); wheel turns pages when the page fits
@@ -78,7 +81,7 @@ final class PagedView implements ReaderMode {
         });
         scroll.addEventFilter(ScrollEvent.SCROLL, e -> {
             if (e.isControlDown()) return;
-            boolean fits = state.fit == ReaderState.Fit.PAGE;
+            boolean fits = state.fit == ReaderState.Fit.PAGE && !zoomed();
             double v = scroll.getVvalue();
             if (fits || (e.getDeltaY() < 0 && v >= 0.999) || (e.getDeltaY() > 0 && v <= 0.001)) {
                 if (e.getDeltaY() < 0) next();
@@ -96,6 +99,15 @@ final class PagedView implements ReaderMode {
     @Override
     public int current() {
         return page;
+    }
+
+    private boolean zoomed() {
+        return state.zoom > 1.001;
+    }
+
+    /** Whether the page can be scrolled (width fit, or zoomed in). */
+    private boolean scrollable() {
+        return state.fit == ReaderState.Fit.WIDTH || zoomed();
     }
 
     private boolean spread() {
@@ -169,8 +181,27 @@ final class PagedView implements ReaderMode {
     @Override
     public void relayout() {
         // fit page: nothing to scroll (rounding could otherwise show a 1px scrollbar)
-        scroll.setVbarPolicy(state.fit == ReaderState.Fit.PAGE ? ScrollPane.ScrollBarPolicy.NEVER : ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        applyScrollPolicy();
         render(0);
+    }
+
+    private void applyScrollPolicy() {
+        scroll.setFitToWidth(!zoomed());
+        stage.setMinWidth(zoomed() ? scroll.getViewportBounds().getWidth() : 0);
+        scroll.setHbarPolicy(zoomed() ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(scrollable() ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
+    }
+
+    @Override
+    public void zoomChanged() {
+        applyScrollPolicy();
+        // resize what is on screen right away (cheap, slightly soft), then decode sharp pages once zooming settles
+        int[] b = box();
+        for (ImageView iv : List.of(left, right)) {
+            Image img = iv.getImage();
+            if (img != null) size(iv, img, b);
+        }
+        sharpen.playFromStart();
     }
 
     /** Target box for one page in device pixels. */
@@ -181,12 +212,21 @@ final class PagedView implements ReaderMode {
         double pad = state.immersive ? 0 : 20;
         double w = Math.max(200, vp.getWidth() - 2 * pad) / shown;
         double h = Math.max(200, vp.getHeight() - 2 * pad);
+        double z = state.zoom;
         if (state.fit == ReaderState.Fit.WIDTH) {
-            w = Math.min(w, (shown == 2 ? 1800 : 1100) / (double) shown);
-            return new int[]{(int) (w * scale), 0, (int) w, 0};
+            w = Math.min(w, (shown == 2 ? 1800 : 1100) / (double) shown) * z;
+            return new int[]{(int) Math.min(w * scale, MAX_DEVICE_W), 0, (int) w, 0};
         }
-        return new int[]{(int) (w * scale), (int) (h * scale), (int) w, (int) h};
+        w *= z;
+        h *= z;
+        // decode no larger than the cap; the ImageView stretches the rest (only matters at 300 %+ on big screens)
+        double pw = w * scale, ph = h * scale;
+        double cap = Math.min(1.0, Math.min(MAX_DEVICE_W / pw, Math.sqrt(MAX_DEVICE_PIXELS / (pw * ph))));
+        return new int[]{(int) (pw * cap), (int) (ph * cap), (int) w, (int) h};
     }
+
+    private static final double MAX_DEVICE_W = 4800;
+    private static final double MAX_DEVICE_PIXELS = 20_000_000;
 
     private void render(int dir) {
         int id = ++requestId;
@@ -218,7 +258,10 @@ final class PagedView implements ReaderMode {
                 apply(imgs[0], imgs[1], b, dir);
             }));
         }
-        loader.preload(first + count - 1, state.preloadAhead, state.preloadBehind, b[0], b[1]);
+        // zoomed pages are big: keep the read-ahead small so the cache isn't flooded
+        int ahead = zoomed() ? Math.min(2, state.preloadAhead) : state.preloadAhead;
+        int behind = zoomed() ? 0 : state.preloadBehind;
+        loader.preload(first + count - 1, ahead, behind, b[0], b[1]);
     }
 
     private void apply(Image a, Image c, int[] b, int dir) {
@@ -248,6 +291,7 @@ final class PagedView implements ReaderMode {
             p.setInterpolator(Anim.EASE);
             f.setInterpolator(Anim.EASE);
             t.setInterpolator(Anim.EASE);
+            Anim.cacheWhile(frame, p); // move a bitmap, don't re-render a full-screen page every frame
             p.play();
         }
         if (dir != 0) scroll.setVvalue(0);
@@ -278,11 +322,11 @@ final class PagedView implements ReaderMode {
             }
             case PAGE_UP, BACK_SPACE -> prev();
             case DOWN, S -> {
-                if (state.fit == ReaderState.Fit.WIDTH && scroll.getVvalue() < 0.999) scroll.setVvalue(Math.min(1, scroll.getVvalue() + 0.15));
+                if (scrollable() && scroll.getVvalue() < 0.999) scroll.setVvalue(Math.min(1, scroll.getVvalue() + 0.15));
                 else next();
             }
             case UP, W -> {
-                if (state.fit == ReaderState.Fit.WIDTH && scroll.getVvalue() > 0.001) scroll.setVvalue(Math.max(0, scroll.getVvalue() - 0.15));
+                if (scrollable() && scroll.getVvalue() > 0.001) scroll.setVvalue(Math.max(0, scroll.getVvalue() - 0.15));
                 else prev();
             }
             case HOME -> go(0, true);
@@ -297,5 +341,6 @@ final class PagedView implements ReaderMode {
     @Override
     public void dispose() {
         requestId++;
+        sharpen.stop();
     }
 }

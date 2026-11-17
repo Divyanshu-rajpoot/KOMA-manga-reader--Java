@@ -69,6 +69,14 @@ public final class ThumbCache {
     }
 
     public CompletableFuture<Image> cover(String path, long size, long mtime) {
+        return cover(path, size, mtime, () -> true);
+    }
+
+    /**
+     * Like {@link #cover(String, long, long)}, but {@code wanted} is checked before the expensive steps; when it turns
+     * false (the cover scrolled out of view) the work is skipped and the future completes with null.
+     */
+    public CompletableFuture<Image> cover(String path, long size, long mtime, java.util.function.BooleanSupplier wanted) {
         String k = key(path, size, mtime);
         Image hit = mem.get(k);
         if (hit != null) return CompletableFuture.completedFuture(hit);
@@ -78,6 +86,7 @@ public final class ThumbCache {
             // shouldn't decode dozens of covers at once on unbounded threads)
             CompletableFuture<Image> f = Exec.io(() -> {
                 try {
+                    if (!wanted.getAsBoolean()) return null;
                     if (Files.isRegularFile(file)) return Files.readAllBytes(file);
                     try (CbzIndex idx = CbzIndex.open(Path.of(path))) {
                         if (idx.pageCount() == 0) throw new IOException("No images in archive");
@@ -87,6 +96,7 @@ public final class ThumbCache {
                     throw new CompletionException(e);
                 }
             }).thenApplyAsync(bytes -> {
+                if (bytes == null || !wanted.getAsBoolean()) return null;
                 try {
                     boolean cached = Files.isRegularFile(file);
                     BufferedImage bi = PageDecoder.decodeBuffered(bytes, WIDTH, 0);

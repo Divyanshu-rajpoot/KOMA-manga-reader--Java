@@ -10,8 +10,6 @@ import app.koma.ui.reader.ReaderView;
 import app.koma.ui.series.SeriesView;
 import app.koma.ui.settings.SettingsView;
 import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
@@ -96,16 +94,19 @@ public final class Router {
         host.requestFocus(); // otherwise focus falls to the first focusable node: the search box
         onChange.accept(e.screen(), next.title());
         if (!MotionPrefs.reduced()) {
+            // Fade only (a 10 px slide re-rasterized text on every frame and shimmered). The new screen is already
+            // built and laid out when the fade starts, so the first frames aren't spent on construction.
             root.setOpacity(0);
-            FadeTransition f = new FadeTransition(Anim.PAGE, root);
+            FadeTransition f = new FadeTransition(Anim.UI, root);
             f.setToValue(1);
-            TranslateTransition t = new TranslateTransition(Anim.PAGE, root);
-            t.setFromY(10);
-            t.setToY(0);
-            ParallelTransition p = new ParallelTransition(f, t);
             f.setInterpolator(Anim.EASE);
-            t.setInterpolator(Anim.EASE);
-            p.play();
+            Anim.cacheWhile(root, f);
+            f.setOnFinished(ev -> root.setOpacity(1));
+            View shown = next;
+            javafx.application.Platform.runLater(() -> {
+                if (current == shown) f.play();
+                else root.setOpacity(1);
+            });
         }
         next.onShown();
     }

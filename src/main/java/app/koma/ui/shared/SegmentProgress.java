@@ -1,19 +1,13 @@
 package app.koma.ui.shared;
 
-import app.koma.core.Anim;
-import app.koma.core.MotionPrefs;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.util.Duration;
 
 /** 20 blocks with a 3px gap; filled blocks are ink, the last filled block is the accent. */
 public final class SegmentProgress extends HBox {
     public static final int BLOCKS = 20;
     private final Region[] blocks = new Region[BLOCKS];
-    private Timeline fill;
 
     public SegmentProgress(double blockHeight) {
         super(3);
@@ -32,22 +26,9 @@ public final class SegmentProgress extends HBox {
         getChildren().addAll(blocks);
     }
 
-    /** Sets progress 0..1; animated block by block unless motion is reduced. */
+    /** Sets progress 0..1. {@code animate} is accepted for compatibility but ignored: the block-by-block fill restyled 20 nodes per tick. */
     public void set(double fraction, boolean animate) {
-        int n = fraction <= 0 ? 0 : Math.max(1, (int) Math.round(Math.min(1, fraction) * BLOCKS));
-        if (fill != null) fill.stop();
-        if (!animate || MotionPrefs.reduced()) {
-            paint(n);
-            return;
-        }
-        paint(0);
-        fill = new Timeline();
-        double step = Anim.UI.toMillis() / Math.max(1, n);
-        for (int i = 1; i <= n; i++) {
-            int k = i;
-            fill.getKeyFrames().add(new KeyFrame(Duration.millis(step * i), e -> paint(k)));
-        }
-        fill.play();
+        paint(fraction <= 0 ? 0 : Math.max(1, (int) Math.round(Math.min(1, fraction) * BLOCKS)));
     }
 
     private void paint(int n) {

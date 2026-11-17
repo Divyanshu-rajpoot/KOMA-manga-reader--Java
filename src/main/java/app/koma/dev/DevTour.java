@@ -77,6 +77,12 @@ public final class DevTour {
         }
         step(0.5, () -> openFirst(paged()));
         step(2.5, () -> shot("03-reader-single"));
+        for (int i = 0; i < 3; i++) step(0.1, () -> key(KeyCode.EQUALS));
+        step(1.0, () -> shot("03b-reader-zoom-175"));
+        for (int i = 0; i < 6; i++) step(0.1, () -> key(KeyCode.MINUS));
+        step(1.0, () -> shot("03c-reader-zoom-25"));
+        step(0.1, () -> key(KeyCode.DIGIT0));
+        step(0.8, () -> shot("03d-reader-zoom-reset"));
         step(0.1, () -> key(KeyCode.LEFT));
         step(0.1, () -> key(KeyCode.LEFT));
         step(0.1, () -> key(KeyCode.LEFT));
@@ -90,6 +96,14 @@ public final class DevTour {
         step(0.1, () -> ctx.router.back());
         step(0.5, () -> openFirst(strip()));
         step(2.0, () -> shot("06-reader-strip"));
+        step(0.1, () -> key(KeyCode.DIGIT3));
+        step(1.5, () -> shot("06a-reader-real-strip"));
+        for (int i = 0; i < 2; i++) step(0.1, () -> key(KeyCode.EQUALS));
+        step(1.2, () -> shot("06b-reader-strip-zoom-150"));
+        for (int i = 0; i < 4; i++) step(0.1, () -> key(KeyCode.MINUS));
+        step(1.2, () -> shot("06c-reader-strip-zoom-50"));
+        step(0.1, () -> key(KeyCode.DIGIT0));
+        step(0.8, () -> shot("06d-reader-strip-reset"));
         step(0.1, () -> key(KeyCode.PAGE_DOWN));
         step(0.1, () -> key(KeyCode.PAGE_DOWN));
         step(1.5, () -> shot("07-reader-strip-scrolled"));

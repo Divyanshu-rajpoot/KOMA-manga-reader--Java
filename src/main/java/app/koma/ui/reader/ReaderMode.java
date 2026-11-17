@@ -20,6 +20,9 @@ interface ReaderMode {
     /** Viewport or zoom changed: re-request pages at the new size. */
     void relayout();
 
+    /** Zoom changed: resize what is on screen right away, then re-decode sharp pages shortly after. */
+    void zoomChanged();
+
     /** Mode-specific keys; return true if handled. */
     boolean onKey(KeyEvent e);
 

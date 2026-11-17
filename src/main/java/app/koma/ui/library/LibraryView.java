@@ -1,14 +1,13 @@
 package app.koma.ui.library;
 
 import app.koma.AppContext;
-import app.koma.core.Anim;
 import app.koma.library.Series;
 import app.koma.library.Volume;
 import app.koma.ui.shared.CatalogTable;
 import app.koma.ui.shared.CoverView;
 import app.koma.ui.shared.Css;
 import app.koma.ui.shared.Fmt;
-import app.koma.ui.shared.ResponsiveGrid;
+import app.koma.ui.shared.VirtualGrid;
 import app.koma.ui.shared.ThinProgress;
 import app.koma.ui.shell.Screen;
 import app.koma.ui.shell.View;
@@ -179,31 +178,43 @@ public final class LibraryView implements View {
     }
 
     private Node grid(List<Series> list) {
-        ResponsiveGrid grid = new ResponsiveGrid(170, 22, 28, 2, 6);
-        List<Node> tiles = new ArrayList<>();
-        for (Series s : list) tiles.add(tile(s));
-        grid.getChildren().setAll(tiles);
-        Anim.stagger(tiles);
-        return grid;
+        // virtualized: only tiles near the viewport exist, so thousands of series stay smooth
+        return VirtualGrid.pooled(scroll, list.size(), SeriesTile::new, (n, i) -> ((SeriesTile) n).bind(list.get(i)),
+                170, 22, 28, 2, 6);
     }
 
-    private Node tile(Series s) {
-        CoverView cover = new CoverView(ctx, s, null, 200);
-        cover.getStyleClass().add("hover-lift");
-        cover.setBadgeVisible(false);
-        Label name = new Label(Fmt.upper(s.title));
-        name.getStyleClass().add("tile-title");
-        Label sub = new Label(s.finishedCount() + " / " + s.volumes.size() + " volumes read");
-        sub.getStyleClass().add("mono-s");
-        ThinProgress bar = new ThinProgress(4);
-        bar.set(s.volumes.isEmpty() ? 0 : s.volumes.stream().mapToDouble(Volume::fraction).sum() / s.volumes.size());
-        VBox t = new VBox(6, cover, name, sub, bar);
-        VBox.setMargin(name, new Insets(8, 0, 0, 0));
-        t.setOnMouseClicked(e -> {
-            if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) ctx.router.navigate(Screen.SERIES, s.id);
-        });
-        t.setOnContextMenuRequested(e -> menu(s).show(t, e.getScreenX(), e.getScreenY()));
-        return t;
+    /** A library tile that is re-bound to different series as the grid scrolls. */
+    private final class SeriesTile extends VBox {
+        private final CoverView cover = new CoverView(ctx, 200);
+        private final Label name = new Label();
+        private final Label sub = new Label();
+        private final ThinProgress bar = new ThinProgress(4);
+        private Series series;
+
+        SeriesTile() {
+            super(6);
+            // scrolling moves a bitmap instead of re-rasterizing the cover's shapes and text on every frame
+            setCache(true);
+            setCacheHint(javafx.scene.CacheHint.SPEED);
+            cover.getStyleClass().add("hover-lift");
+            cover.setBadgeVisible(false);
+            name.getStyleClass().add("tile-title");
+            sub.getStyleClass().add("mono-s");
+            getChildren().addAll(cover, name, sub, bar);
+            VBox.setMargin(name, new Insets(8, 0, 0, 0));
+            setOnMouseClicked(e -> {
+                if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) ctx.router.navigate(Screen.SERIES, series.id);
+            });
+            setOnContextMenuRequested(e -> menu(series).show(this, e.getScreenX(), e.getScreenY()));
+        }
+
+        void bind(Series s) {
+            series = s;
+            cover.bind(s, null);
+            name.setText(Fmt.upper(s.title));
+            sub.setText(s.finishedCount() + " / " + s.volumes.size() + " volumes read");
+            bar.set(s.volumes.isEmpty() ? 0 : s.volumes.stream().mapToDouble(Volume::fraction).sum() / s.volumes.size());
+        }
     }
 
     private ContextMenu menu(Series s) {
@@ -227,13 +238,12 @@ public final class LibraryView implements View {
         CatalogTable t = new CatalogTable(
                 new String[]{"ID", "SERIES", "TYPE", "DIRECTION", "VOLS", "READ", "PAGES", "SIZE", "LAST READ"},
                 new double[]{0.5, 2.4, 0.9, 1.2, 0.6, 0.7, 0.8, 0.9, 1.2});
-        int i = 1;
-        for (Series s : list) {
-            t.addRow(List.of(Fmt.pad3(i++), Fmt.upper(s.title), Fmt.upper(s.type), s.directionLabel(),
+        t.setVirtual(scroll, list.size(), i -> {
+            Series s = list.get(i);
+            return List.of(Fmt.pad3(i + 1), Fmt.upper(s.title), Fmt.upper(s.type), s.directionLabel(),
                     s.volumes.size(), s.finishedCount() + "/" + s.volumes.size(), s.totalPages(),
-                    Fmt.bytes(s.totalSize()), Fmt.ago(s.lastReadAt())), () -> ctx.router.navigate(Screen.SERIES, s.id));
-        }
-        Anim.stagger(t.rows());
+                    Fmt.bytes(s.totalSize()), Fmt.ago(s.lastReadAt()));
+        }, i -> ctx.router.navigate(Screen.SERIES, list.get(i).id));
         return t;
     }
 

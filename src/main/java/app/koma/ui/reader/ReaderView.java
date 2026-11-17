@@ -76,6 +76,8 @@ public final class ReaderView implements View {
     private final PauseTransition hideCursor = new PauseTransition(Duration.millis(2200));
     private javafx.beans.value.ChangeListener<Boolean> fullScreenListener;
     private EventHandler<KeyEvent> keys;
+    private final ZoomBar zoomBar = new ZoomBar(this::setZoom);
+    private final PauseTransition hideZoom = new PauseTransition(Duration.millis(1800));
 
     public ReaderView(AppContext ctx, String volumeId) {
         this.ctx = ctx;
@@ -91,7 +93,10 @@ public final class ReaderView implements View {
         }
         StackPane.setAlignment(overlayTop, Pos.TOP_CENTER);
         StackPane.setAlignment(overlayBottom, Pos.BOTTOM_CENTER);
-        root.getChildren().addAll(layout, overlayTop, overlayBottom);
+        StackPane.setAlignment(zoomBar, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(zoomBar, new Insets(0, 26, 132, 0));
+        root.getChildren().addAll(layout, overlayTop, overlayBottom, zoomBar);
+        hideZoom.setOnFinished(e -> syncZoomBar());
         hideOverlays.setOnFinished(e -> showOverlays(false));
         hideCursor.setOnFinished(e -> {
             if (immersive) root.setCursor(javafx.scene.Cursor.NONE);
@@ -185,10 +190,11 @@ public final class ReaderView implements View {
 
     private int[] cachedRange() {
         // report pages that are decoded at any size near the current one
+        // bounded: each probe scans the cache, so only look as far as the thumbnail strip shows
         int lo = page, hi = page;
         int n = loader.pageCount();
-        while (lo - 1 >= 0 && anyCached(lo - 1)) lo--;
-        while (hi + 1 < n && anyCached(hi + 1)) hi++;
+        while (lo - 1 >= 0 && page - lo < 8 && anyCached(lo - 1)) lo--;
+        while (hi + 1 < n && hi - page < 8 && anyCached(hi + 1)) hi++;
         return anyCached(page) ? new int[]{lo, hi} : null;
     }
 
@@ -306,7 +312,7 @@ public final class ReaderView implements View {
             ctx.theme.toggle();
             ctx.window.nav().updateThemeIcon();
         });
-        MenuItem help = new MenuItem("Shortcuts: ← → Space PgUp/PgDn Home End · 1 2 3 modes · F full screen · Z fit · Tab bars · Esc");
+        MenuItem help = new MenuItem("Shortcuts: ← → Space PgUp/PgDn Home End · 1 2 3 modes · F full screen · Z fit · + − 0 zoom (or Ctrl+wheel) · Tab bars · Esc");
         help.setDisable(true);
         return new ContextMenu(read, open, prev, next, theme, help);
     }
@@ -333,6 +339,29 @@ public final class ReaderView implements View {
         BorderPane.setMargin(strip, new Insets(6, 22, 12, 22));
         placeChrome();
         strip.setPage(page, null);
+    }
+
+    /** Zoom 25 to 400 %, from the slider, Ctrl +/-/0, Ctrl+wheel or a pinch. */
+    private void setZoom(double z) {
+        z = Math.max(ZoomBar.MIN, Math.min(ZoomBar.MAX, Math.round(z * 100) / 100.0));
+        if (Math.abs(z - state.zoom) < 0.001) {
+            zoomBar.set(state.zoom);
+            return;
+        }
+        state.zoom = z;
+        zoomBar.set(z);
+        if (mode != null) mode.zoomChanged();
+        syncZoomBar();
+        if (immersive) hideZoom.playFromStart(); // full screen: flash the bar, then tuck it away again
+    }
+
+    private void zoomBy(double delta) {
+        setZoom(state.zoom + delta);
+    }
+
+    /** In full screen the zoom bar shows with the other controls (or briefly after a zoom). */
+    private void syncZoomBar() {
+        zoomBar.setVisible(!immersive || overlayBottom.isVisible() || hideZoom.getStatus() == javafx.animation.Animation.Status.RUNNING);
     }
 
     private void setFit(ReaderState.Fit f) {
@@ -382,6 +411,7 @@ public final class ReaderView implements View {
         boolean visible = show && immersive;
         overlayTop.setVisible(visible);
         overlayBottom.setVisible(visible);
+        syncZoomBar();
     }
 
     private void toggleImmersive() {
@@ -435,6 +465,17 @@ public final class ReaderView implements View {
             if (handleKey(e)) e.consume();
         };
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keys);
+        // Ctrl + wheel and trackpad pinch zoom (filters run before the page views see the event)
+        root.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, e -> {
+            if (e.isShortcutDown() && mode != null) {
+                if (e.getDeltaY() != 0) setZoom(state.zoom * (e.getDeltaY() > 0 ? 1.1 : 1 / 1.1)); // proportional, so 25% to 400% is the same effort each way
+                e.consume();
+            }
+        });
+        root.addEventFilter(javafx.scene.input.ZoomEvent.ZOOM, e -> {
+            if (mode != null) setZoom(state.zoom * e.getZoomFactor());
+            e.consume();
+        });
         root.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.MIDDLE) {
                 toggleChrome();
@@ -478,6 +519,16 @@ public final class ReaderView implements View {
             return true;
         }
         if (mode == null) return false;
+        boolean plus = k == KeyCode.EQUALS || k == KeyCode.PLUS || k == KeyCode.ADD;
+        boolean minus = k == KeyCode.MINUS || k == KeyCode.SUBTRACT;
+        if (plus || minus) {
+            zoomBy(plus ? ZoomBar.STEP : -ZoomBar.STEP);
+            return true;
+        }
+        if (k == KeyCode.DIGIT0 || k == KeyCode.NUMPAD0) {
+            setZoom(1);
+            return true;
+        }
         if (e.isShortcutDown() && (k == KeyCode.LEFT || k == KeyCode.RIGHT)) {
             Volume v = neighbour(k == KeyCode.RIGHT ? 1 : -1);
             if (v != null) ctx.router.replace(Screen.READER, v.id);
@@ -505,6 +556,7 @@ public final class ReaderView implements View {
         resizeLater.stop();
         hideOverlays.stop();
         hideCursor.stop();
+        hideZoom.stop();
         if (fullScreenListener != null) ctx.stage.fullScreenProperty().removeListener(fullScreenListener);
         if (keys != null && root.getScene() != null) root.getScene().removeEventFilter(KeyEvent.KEY_PRESSED, keys);
         if (volume != null && loader != null) {

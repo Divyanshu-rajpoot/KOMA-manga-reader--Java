@@ -159,22 +159,20 @@ public final class HomeView implements View {
         CatalogTable t = new CatalogTable(
                 new String[]{"ID", "SERIES", "TYPE", "VOLS", "READ", "SIZE", "STATUS"},
                 new double[]{0.6, 2.4, 1.2, 0.8, 0.8, 1, 1});
-        int i = 1;
-        for (Series s : all) {
-            String st = s.status();
-            Label tag = switch (st) {
+        // virtualized: rows exist only near the viewport (a row is ~10 nodes; thousands of series used to build all of them)
+        t.setVirtual(scroll, all.size(), i -> {
+            Series s = all.get(i);
+            Label tag = switch (s.status()) {
                 case "reading" -> CatalogTable.tag("OUT", "out");
                 case "finished" -> CatalogTable.tag("FINISHED", "finished");
                 default -> CatalogTable.tag("ON SHELF", "shelf");
             };
-            t.addRow(List.of(Fmt.pad3(i++), Fmt.upper(s.title), Fmt.upper(s.type), s.volumes.size(),
-                            s.finishedCount() + "/" + s.volumes.size(), Fmt.bytes(s.totalSize()), tag),
-                    () -> ctx.router.navigate(Screen.SERIES, s.id));
-        }
+            return List.of(Fmt.pad3(i + 1), Fmt.upper(s.title), Fmt.upper(s.type), s.volumes.size(),
+                    s.finishedCount() + "/" + s.volumes.size(), Fmt.bytes(s.totalSize()), tag);
+        }, i -> ctx.router.navigate(Screen.SERIES, all.get(i).id));
         HBox.setHgrow(t, Priority.ALWAYS);
         VBox wrap = new VBox(t);
         wrap.setAlignment(Pos.TOP_LEFT);
-        Anim.stagger(t.rows());
         return wrap;
     }
 

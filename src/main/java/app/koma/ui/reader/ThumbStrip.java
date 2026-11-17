@@ -29,6 +29,8 @@ final class ThumbStrip extends VBox {
     private final Label status = new Label();
     private boolean syncing;
     private int page;
+    /** Thumbnail nodes are reused across page turns: only the highlight classes change. */
+    private final java.util.LinkedHashMap<Integer, StackPane> nodes = new java.util.LinkedHashMap<>(64, 0.75f, true);
 
     ThumbStrip(PageLoader loader, boolean rtl, IntConsumer onJump) {
         this.loader = loader;
@@ -75,13 +77,27 @@ final class ThumbStrip extends VBox {
         int end = Math.min(n, start + COUNT);
         java.util.List<javafx.scene.Node> list = new java.util.ArrayList<>();
         for (int i = start; i < end; i++) {
-            list.add(thumb(i, i == p, cachedRange != null && i >= cachedRange[0] && i <= cachedRange[1]));
+            StackPane box = nodes.computeIfAbsent(i, this::thumb);
+            style(box, "current", i == p);
+            style(box, "cached", cachedRange != null && i >= cachedRange[0] && i <= cachedRange[1]);
+            list.add(box);
+        }
+        while (nodes.size() > 60) { // drop the least recently shown
+            var it = nodes.entrySet().iterator();
+            it.next();
+            it.remove();
         }
         if (rtl) java.util.Collections.reverse(list);
         thumbs.getChildren().setAll(list);
     }
 
-    private StackPane thumb(int i, boolean current, boolean cached) {
+    private static void style(StackPane box, String cls, boolean on) {
+        boolean has = box.getStyleClass().contains(cls);
+        if (on && !has) box.getStyleClass().add(cls);
+        else if (!on && has) box.getStyleClass().remove(cls);
+    }
+
+    private StackPane thumb(int i) {
         ImageView iv = new ImageView();
         iv.setFitHeight(THUMB_H);
         iv.setFitWidth(THUMB_H * 0.7);
@@ -89,8 +105,6 @@ final class ThumbStrip extends VBox {
         iv.setSmooth(true);
         StackPane box = new StackPane(iv);
         box.getStyleClass().add("page-thumb");
-        if (current) box.getStyleClass().add("current");
-        if (cached) box.getStyleClass().add("cached");
         box.setMinSize(THUMB_H * 0.7 + 4, THUMB_H + 4);
         box.setMaxSize(THUMB_H * 0.7 + 4, THUMB_H + 4);
         box.setOnMouseClicked(e -> onJump.accept(i));

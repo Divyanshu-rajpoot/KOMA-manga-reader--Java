@@ -77,3 +77,40 @@
     -fx-effect: null;
 }
 .reader-overlay { -fx-background-color: -reader-overlay; }
+
+/* zoom control: a floating pill above the thumbnail strip */
+.zoom-bar {
+    -fx-background-color: -reader-overlay;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-padding: 6 12 6 8;
+    -fx-opacity: 0.72;
+}
+.zoom-bar:hover { -fx-opacity: 1; }
+.zoom-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: -ink;
+    -fx-border-width: 2;
+    -fx-min-width: 28px; -fx-pref-width: 28px;
+    -fx-min-height: 28px; -fx-pref-height: 28px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+.zoom-button:hover { -fx-background-color: -acc; -fx-border-color: -acc; }
+.zoom-button .glyph { -fx-background-color: -text; }
+.zoom-button:hover .glyph { -fx-background-color: -on-acc; }
+.zoom-slider .track { -fx-background-color: -line; -fx-background-radius: 0; -fx-pref-height: 3; }
+.zoom-slider .thumb {
+    -fx-background-color: -acc;
+    -fx-background-radius: 0;
+    -fx-pref-width: 10;
+    -fx-pref-height: 18;
+}
+.zoom-slider:hover .thumb { -fx-background-color: -ink; }
+.zoom-percent {
+    -fx-font-family: "IBM Plex Mono";
+    -fx-font-size: 12px;
+    -fx-text-fill: -text;
+    -fx-cursor: hand;
+}

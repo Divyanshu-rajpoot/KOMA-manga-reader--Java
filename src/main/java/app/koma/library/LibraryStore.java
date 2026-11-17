@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The library (library.json). Mutate from one thread (the FX thread in the app); writes are
- * serialised immediately and flushed to disk atomically on an I/O thread, newest snapshot wins.
+ * coalesced, serialised and flushed to disk atomically on an I/O thread, newest snapshot wins.
  */
 public final class LibraryStore {
     private final Path file;
@@ -159,10 +159,40 @@ public final class LibraryStore {
         for (Runnable r : listeners) r.run();
     }
 
-    /** Snapshot now, write on an I/O thread. */
+    private final java.util.concurrent.atomic.AtomicBoolean writeQueued = new java.util.concurrent.atomic.AtomicBoolean();
+
+    /**
+     * Schedules a write. Changes within 400 ms share one write, and the JSON is built on an I/O thread:
+     * serializing a big library on every change (every few page turns, every import) used to stall the UI.
+     */
     public void save() {
-        pending.set(Json.bytes(lib));
-        Exec.io(this::flush);
+        if (!writeQueued.compareAndSet(false, true)) return;
+        Exec.io(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            writeQueued.set(false);
+            // the FX thread may mutate the lists mid-serialization (ConcurrentModificationException): retry, it is rare
+            for (int attempt = 0; attempt < 5; attempt++) {
+                try {
+                    synchronized (writeLock) {
+                        pending.set(Json.bytes(lib));
+                        flush();
+                    }
+                    return;
+                } catch (RuntimeException e) {
+                    try {
+                        Thread.sleep(25);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+            }
+            save(); // still racing with edits: queue another pass
+        });
     }
 
     /** Blocking write of the latest snapshot (shutdown, tests). */
@@ -179,8 +209,10 @@ public final class LibraryStore {
     }
 
     public void saveNow() {
-        pending.set(Json.bytes(lib));
-        flush();
+        synchronized (writeLock) {
+            pending.set(Json.bytes(lib));
+            flush();
+        }
     }
 
     // ---------- ids ----------

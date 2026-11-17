@@ -46,6 +46,7 @@ public class App extends Application {
         ctx.watched = new app.koma.ui.importer.WatchedImports(ctx);
         ctx.watched.restart();
         app.koma.dev.DevTour.startIfRequested(ctx);
+        app.koma.dev.DevPerf.startIfRequested(ctx);
     }
 
     @Override

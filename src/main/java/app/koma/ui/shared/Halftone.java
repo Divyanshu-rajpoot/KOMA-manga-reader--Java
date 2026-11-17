@@ -34,7 +34,21 @@ public final class Halftone extends Region {
         theme.revisionProperty().addListener(new javafx.beans.value.WeakChangeListener<>(onTheme));
     }
 
+    /** One 7x7 tile per token + theme revision, shared by every cover. */
+    private static final java.util.Map<String, ImagePattern> PATTERNS = new java.util.HashMap<>();
+
     private void paint() {
+        String ck = token + "@" + theme.revisionProperty().get();
+        ImagePattern shared = PATTERNS.get(ck);
+        if (shared == null) {
+            if (PATTERNS.size() > 16) PATTERNS.clear();
+            shared = makePattern();
+            PATTERNS.put(ck, shared);
+        }
+        setBackground(new Background(new BackgroundFill(shared, null, null)));
+    }
+
+    private ImagePattern makePattern() {
         Color ink = theme.color(token);
         int size = 7;
         WritableImage tile = new WritableImage(size, size);
@@ -48,6 +62,6 @@ public final class Halftone extends Region {
                 pw.setColor(x, y, new Color(ink.getRed(), ink.getGreen(), ink.getBlue(), a));
             }
         }
-        setBackground(new Background(new BackgroundFill(new ImagePattern(tile, 0, 0, size, size, false), null, null)));
+        return new ImagePattern(tile, 0, 0, size, size, false);
     }
 }

@@ -24,6 +24,11 @@ Use the Maven wrapper (JDK 21 on PATH or `JAVA_HOME`; no global Maven needed):
 - Screenshot tour (never touches the real library): run `app.koma.Launcher` with
   `-Dkoma.home=<tmp> -Dkoma.devtour=<shots dir> -Dkoma.devimport=<folder of CBZs>` (see `dev/DevTour`).
 
+## Performance testing
+- Frame-time benchmark: run `app.koma.Launcher` with `-Dkoma.home=<tmp> -Dkoma.devperf=<series count>` (see `dev/DevPerf`). It seeds a synthetic library, drives the real UI and prints fps, p95/p99/worst frame and UI-thread block per screen. Numbers vary 10-20% run to run, and fps is meaningless if the window is hidden (vsync off); compare p95/worst.
+- Profile with `-XX:StartFlightRecording=filename=x.jfr,settings=profile`; on Windows the FX thread is named `WindowsNativeRunloopThread`. `-Djavafx.pulseLogger=true -Djavafx.pulseLogger.threshold=300` prints slow pulses.
+- Rules learned: never give a view its own `getStylesheets()` (add the sheet in `ThemeManager.SCREENS`); never build one node tree per row of a big list (use `VirtualGrid`, pooled for heavy cells); never serialize the library on the FX thread; cache (`setCache`) nodes that scroll or fade, not nodes that change every frame.
+
 ## Design
 - **Concept 12, "Ink Archive"**, with a light ("paper") and a dark ("ink") theme.
 - Reference: `design/koma-concept-12.html` (open it in a browser and pick Concept 12) and `design/screens/`.

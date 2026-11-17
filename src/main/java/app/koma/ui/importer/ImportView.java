@@ -1,9 +1,7 @@
 package app.koma.ui.importer;
 
 import app.koma.AppContext;
-import app.koma.core.Anim;
 import app.koma.core.Exec;
-import app.koma.core.MotionPrefs;
 import app.koma.library.ImportService;
 import app.koma.library.ImportService.Item;
 import app.koma.library.ImportService.State;
@@ -12,11 +10,6 @@ import app.koma.ui.shared.Fmt;
 import app.koma.ui.shared.Icons;
 import app.koma.ui.shell.Screen;
 import app.koma.ui.shell.View;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,7 +26,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
-import javafx.util.Duration;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -52,7 +44,6 @@ public final class ImportView implements View {
     private final Button openLibrary = new Button("Open library");
     private final List<ImportRow> rows = new ArrayList<>();
     private final Set<String> seen = new HashSet<>();
-    private final Timeline ants;
     private Node keepCard, copyCard;
     private boolean adding;
 
@@ -71,12 +62,6 @@ public final class ImportView implements View {
         border.getStyleClass().add("ants");
         border.setManaged(false);
         StackPane zone = dropZone(border);
-        ants = new Timeline(new KeyFrame(Duration.seconds(1), new KeyValue(border.strokeDashOffsetProperty(), -32, Interpolator.LINEAR)));
-        ants.setCycleCount(Animation.INDEFINITE);
-        Anim.play(ants);
-        MotionPrefs.reducedProperty().addListener((o, a, r) -> {
-            if (r) ants.stop();
-        });
 
         VBox left = new VBox(16, zone, rules(), storageOptions());
         left.setPrefWidth(560);
@@ -202,7 +187,6 @@ public final class ImportView implements View {
     /** Adds files or folders to the queue (folders are scanned off the FX thread). */
     public void addPaths(List<Path> paths) {
         Exec.io(() -> ImportService.expand(paths)).thenAccept(found -> Exec.fx(() -> {
-            int before = rows.size();
             for (Path p : found) {
                 String key = p.toAbsolutePath().toString().toLowerCase();
                 if (!seen.add(key)) continue;
@@ -210,7 +194,6 @@ public final class ImportView implements View {
                 ImportRow row = new ImportRow(ctx, it, this::updateHeader);
                 rows.add(row);
                 queue.getChildren().add(row);
-                Anim.riseIn(row, Anim.STAGGER.multiply(Math.min(rows.size() - before, 12)));
                 ImportService.analyze(it, ctx.store, ctx.settings.defaultDirection).whenComplete((r, err) -> Exec.fx(() -> {
                     if (err != null) {
                         it.state = State.FAILED;
@@ -290,6 +273,5 @@ public final class ImportView implements View {
 
     @Override
     public void dispose() {
-        ants.stop();
     }
 }

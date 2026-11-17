@@ -26,6 +26,12 @@ public final class CatalogTable extends VBox {
 
     /** Cells are Strings (mono labels) or Nodes. The first column is bold. */
     public GridPane addRow(List<Object> cells, Runnable onClick) {
+        GridPane r = buildRow(cells, onClick);
+        getChildren().add(r);
+        return r;
+    }
+
+    private GridPane buildRow(List<Object> cells, Runnable onClick) {
         GridPane r = row();
         r.getStyleClass().setAll("catalog-row");
         for (int i = 0; i < cells.size(); i++) {
@@ -41,8 +47,13 @@ public final class CatalogTable extends VBox {
             r.add(n, i, 0);
         }
         if (onClick != null) r.setOnMouseClicked(e -> onClick.run());
-        getChildren().add(r);
         return r;
+    }
+
+    /** Virtualized body: rows are built only near the viewport (all rows have the same height). */
+    public void setVirtual(javafx.scene.control.ScrollPane scroll, int count,
+                           java.util.function.IntFunction<List<Object>> cells, java.util.function.IntConsumer onClick) {
+        getChildren().add(new VirtualGrid(scroll, count, i -> buildRow(cells.apply(i), () -> onClick.accept(i)), 100, 0, 0, 1, 1));
     }
 
     public List<Node> rows() {

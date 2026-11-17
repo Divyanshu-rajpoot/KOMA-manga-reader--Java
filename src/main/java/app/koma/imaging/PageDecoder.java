@@ -137,47 +137,60 @@ public final class PageDecoder {
         int stride = ((java.awt.image.SinglePixelPackedSampleModel) src.getSampleModel()).getScanlineStride();
         Taps hx = new Taps(sw, tw), vy = new Taps(sh, th);
 
-        // horizontal pass: sw x sh → tw x sh, 4 float channels
-        float[] mid = new float[tw * sh * 4];
-        for (int y = 0; y < sh; y++) {
-            int row = y * stride, m = y * tw * 4;
-            for (int x = 0; x < tw; x++) {
-                float a = 0, r = 0, g = 0, b = 0;
-                int start = hx.start[x], n = hx.len[x], wi = x * hx.max;
-                for (int k = 0; k < n; k++) {
-                    int p = s[row + start + k];
-                    float wt = hx.w[wi + k];
-                    a += (p >>> 24) * wt;
-                    r += ((p >> 16) & 0xFF) * wt;
-                    g += ((p >> 8) & 0xFF) * wt;
-                    b += (p & 0xFF) * wt;
-                }
-                int o = m + x * 4;
-                mid[o] = a;
-                mid[o + 1] = r;
-                mid[o + 2] = g;
-                mid[o + 3] = b;
-            }
-        }
-        // vertical pass: tw x sh → tw x th
+        // Streaming two-pass: each output row needs a handful of source rows, horizontally reduced first.
+        // A small ring of reduced rows replaces the old full-height float buffer (which was width x height x 16 bytes,
+        // over 100 MB for a tall page, allocated by every decode thread at once).
+        int ringSize = vy.max;
+        float[][] ring = new float[ringSize][tw * 4];
+        int[] ringRow = new int[ringSize];
+        java.util.Arrays.fill(ringRow, -1);
         BufferedImage out = new BufferedImage(tw, th, BufferedImage.TYPE_INT_ARGB_PRE);
         int[] d = ((DataBufferInt) out.getRaster().getDataBuffer()).getData();
         for (int y = 0; y < th; y++) {
             int start = vy.start[y], n = vy.len[y], wi = y * vy.max;
+            for (int k = 0; k < n; k++) {
+                int sr = start + k, slot = sr % ringSize;
+                if (ringRow[slot] != sr) {
+                    reduceRow(s, sr * stride, hx, tw, ring[slot]);
+                    ringRow[slot] = sr;
+                }
+            }
             for (int x = 0; x < tw; x++) {
                 float a = 0, r = 0, g = 0, b = 0;
                 for (int k = 0; k < n; k++) {
-                    int o = ((start + k) * tw + x) * 4;
+                    float[] row = ring[(start + k) % ringSize];
+                    int o = x * 4;
                     float wt = vy.w[wi + k];
-                    a += mid[o] * wt;
-                    r += mid[o + 1] * wt;
-                    g += mid[o + 2] * wt;
-                    b += mid[o + 3] * wt;
+                    a += row[o] * wt;
+                    r += row[o + 1] * wt;
+                    g += row[o + 2] * wt;
+                    b += row[o + 3] * wt;
                 }
                 d[y * tw + x] = clamp(a) << 24 | clamp(r) << 16 | clamp(g) << 8 | clamp(b);
             }
         }
         return out;
+    }
+
+    /** Horizontal area-average of one source row into 4 float channels per output pixel. */
+    private static void reduceRow(int[] s, int row, Taps hx, int tw, float[] mid) {
+        for (int x = 0; x < tw; x++) {
+            float a = 0, r = 0, g = 0, b = 0;
+            int start = hx.start[x], n = hx.len[x], wi = x * hx.max;
+            for (int k = 0; k < n; k++) {
+                int p = s[row + start + k];
+                float wt = hx.w[wi + k];
+                a += (p >>> 24) * wt;
+                r += ((p >> 16) & 0xFF) * wt;
+                g += ((p >> 8) & 0xFF) * wt;
+                b += (p & 0xFF) * wt;
+            }
+            int o = x * 4;
+            mid[o] = a;
+            mid[o + 1] = r;
+            mid[o + 2] = g;
+            mid[o + 3] = b;
+        }
     }
 
     private static int clamp(float v) {

@@ -10,7 +10,7 @@ import app.koma.ui.shared.CoverView;
 import app.koma.ui.shared.Css;
 import app.koma.ui.shared.Fmt;
 import app.koma.ui.shared.Icons;
-import app.koma.ui.shared.ResponsiveGrid;
+import app.koma.ui.shared.VirtualGrid;
 import app.koma.ui.shared.ThinProgress;
 import app.koma.ui.shell.Screen;
 import app.koma.ui.shell.View;
@@ -194,9 +194,12 @@ public final class SeriesView implements View {
     }
 
     private Node volumes() {
-        ResponsiveGrid grid = new ResponsiveGrid(120, 18, 22, 3, 8);
-        List<Node> cells = new ArrayList<>();
-        for (Volume v : s.sortedVolumes()) {
+        List<Volume> vols = s.sortedVolumes();
+        return new VirtualGrid(scroll, vols.size(), i -> volumeCell(vols.get(i)), 120, 18, 22, 3, 8);
+    }
+
+    private Node volumeCell(Volume v) {
+        {
             CoverView c = new CoverView(ctx, s, v, 140);
             c.getStyleClass().add("hover-lift");
             ThinProgress bar = new ThinProgress(4);
@@ -208,16 +211,15 @@ public final class SeriesView implements View {
             Label l = new Label(state);
             l.getStyleClass().add("mono-s");
             VBox cell = new VBox(6, c, bar, name, l);
+            cell.setCache(true);
+            cell.setCacheHint(javafx.scene.CacheHint.SPEED);
             VBox.setMargin(name, new javafx.geometry.Insets(2, 0, -4, 0));
             cell.setOnMouseClicked(e -> {
                 if (e.getButton() == MouseButton.PRIMARY) ctx.router.navigate(Screen.READER, v.id);
             });
             cell.setOnContextMenuRequested(e -> volumeMenu(v).show(cell, e.getScreenX(), e.getScreenY()));
-            cells.add(cell);
+            return cell;
         }
-        grid.getChildren().setAll(cells);
-        Anim.stagger(cells);
-        return grid;
     }
 
     private ContextMenu volumeMenu(Volume v) {

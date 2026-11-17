@@ -26,6 +26,22 @@ public final class ThemeManager {
     private static final String DARK = css("/themes/dark.css");
     private static final String ORANGE = css("/themes/accent-orange.css");
 
+    /**
+     * Every screen's stylesheet, loaded once on the scene. Per-parent stylesheets make JavaFX register each styled
+     * node's parent against them (a linear scan per node that grows with every tile ever created, about half of the
+     * UI thread's time when scrolling a big library). Selectors do not overlap between screens.
+     */
+    private static final List<String> SCREENS = List.of(
+            css("/app/koma/ui/shell/shell.css"), css("/app/koma/ui/home/home.css"),
+            css("/app/koma/ui/importer/importer.css"), css("/app/koma/ui/library/library.css"),
+            css("/app/koma/ui/reader/reader.css"), css("/app/koma/ui/series/series.css"),
+            css("/app/koma/ui/settings/settings.css"));
+
+    /** True if this stylesheet is already loaded on the scene (so a view doesn't need to attach it itself). */
+    public static boolean isGlobal(String url) {
+        return SCREENS.contains(url);
+    }
+
     private final Scene scene;
     private final Settings settings;
     private final boolean systemDark;
@@ -65,6 +81,7 @@ public final class ThemeManager {
         colorCache.clear();
         var sheets = scene.getStylesheets();
         sheets.setAll(d ? DARK : LIGHT, BASE);
+        sheets.addAll(SCREENS);
         if ("orange".equals(settings.accent)) sheets.add(ORANGE);
         dark = d;
         revision.set(revision.get() + 1);

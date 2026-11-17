@@ -42,6 +42,9 @@ final class StripView implements ReaderMode {
     private int current;
     private boolean disposed;
     private boolean syncing;
+    private double panX;
+    private double dragX, dragY;
+    private final javafx.animation.PauseTransition sharpen = new javafx.animation.PauseTransition(javafx.util.Duration.millis(220));
 
     StripView(PageLoader loader, ReaderState state, IntConsumer onPage, Runnable onEndForward) {
         this.loader = loader;
@@ -69,9 +72,27 @@ final class StripView implements ReaderMode {
             if (!syncing) setTop(b.doubleValue());
         });
         viewport.addEventFilter(ScrollEvent.SCROLL, e -> {
-            setTop(top - e.getDeltaY() * 2.2);
+            if (e.isControlDown()) return; // zoom is handled by the reader
+            if (e.isShiftDown() || e.getDeltaX() != 0) {
+                setPanX(panX + (e.getDeltaX() != 0 ? e.getDeltaX() : e.getDeltaY()));
+            } else {
+                setTop(top - e.getDeltaY() * 2.2);
+            }
             e.consume();
         });
+        // drag to scroll (and to pan sideways when zoomed in)
+        viewport.setOnMousePressed(e -> {
+            dragX = e.getX();
+            dragY = e.getY();
+        });
+        viewport.setOnMouseDragged(e -> {
+            double dx = e.getX() - dragX, dy = e.getY() - dragY;
+            dragX = e.getX();
+            dragY = e.getY();
+            setPanX(panX + dx);
+            setTop(top - dy);
+        });
+        sharpen.setOnFinished(e -> refreshLive());
         loadSizes();
     }
 
@@ -133,13 +154,59 @@ final class StripView implements ReaderMode {
         if (w <= 0) return;
         int anchor = current;
         double within = tops[anchor + 1] > tops[anchor] ? (top - tops[anchor]) / (tops[anchor + 1] - tops[anchor]) : 0;
-        double maxCol = state.fit == ReaderState.Fit.WIDTH ? 1400 : 820;
-        colW = Math.max(240, Math.min(w - 32, maxCol));
+        colW = columnWidth(w);
         computeTops();
         for (ImageView iv : live.values()) iv.setImage(null);
         live.clear();
         viewport.getChildren().clear();
         setTop(tops[anchor] + within * (tops[anchor + 1] - tops[anchor]));
+    }
+
+    /** Column width: the fit width, times the zoom (a zoomed column may be wider than the viewport). */
+    private double columnWidth(double viewW) {
+        double maxCol = state.fit == ReaderState.Fit.WIDTH ? 1400 : 820;
+        double base = Math.max(240, Math.min(viewW - 32, maxCol));
+        return base * state.zoom;
+    }
+
+    private void setPanX(double v) {
+        double limit = Math.max(0, (colW - viewport.getWidth()) / 2);
+        double nv = Math.max(-limit, Math.min(limit, v));
+        if (nv != panX) {
+            panX = nv;
+            update();
+        }
+    }
+
+    @Override
+    public void zoomChanged() {
+        double w = viewport.getWidth();
+        if (w <= 0) return;
+        int anchor = current;
+        double within = tops[anchor + 1] > tops[anchor] ? (top - tops[anchor]) / (tops[anchor + 1] - tops[anchor]) : 0;
+        colW = columnWidth(w);
+        computeTops();
+        panX = 0;
+        setTop(tops[anchor] + within * (tops[anchor + 1] - tops[anchor])); // live views stretch at once
+        sharpen.playFromStart();
+    }
+
+    /** Re-decode on-screen pages at the settled zoom and swap them in without clearing (no flicker). */
+    private void refreshLive() {
+        if (disposed) return;
+        int targetW = targetWidth();
+        for (var e : new java.util.ArrayList<>(live.entrySet())) {
+            int page = e.getKey();
+            ImageView view = e.getValue();
+            loader.load(page, targetW, 0).whenComplete((img, err) -> Exec.fx(() -> {
+                if (img != null && live.get(page) == view) view.setImage(img);
+            }));
+        }
+    }
+
+    private int targetWidth() {
+        double scale = viewport.getScene() == null ? 1 : Math.max(1, viewport.getScene().getWindow().getOutputScaleX());
+        return (int) Math.min(4800, Math.round(colW * scale));
     }
 
     private void setTop(double t) {
@@ -170,11 +237,10 @@ final class StripView implements ReaderMode {
         if (disposed || ratio.length == 0) return;
         double vh = viewport.getHeight(), vw = viewport.getWidth();
         if (vh <= 0 || vw <= 0) return;
-        double x = Math.round((vw - colW) / 2);
+        double x = Math.round((vw - colW) / 2 + panX);
         int first = pageAt(Math.max(0, top - vh * 0.5));
         int last = pageAt(top + vh * 1.8);
-        double scale = viewport.getScene() == null ? 1 : Math.max(1, viewport.getScene().getWindow().getOutputScaleX());
-        int targetW = (int) Math.round(colW * scale);
+        int targetW = targetWidth();
 
         Iterator<Map.Entry<Integer, ImageView>> it = live.entrySet().iterator();
         while (it.hasNext()) {
@@ -216,7 +282,7 @@ final class StripView implements ReaderMode {
             current = cur;
             onPage.accept(cur);
         }
-        loader.preload(last, state.preloadAhead, 0, targetW, 0);
+        loader.preload(last, state.zoom > 1.001 ? Math.min(2, state.preloadAhead) : state.preloadAhead, 0, targetW, 0);
     }
 
     @Override
@@ -266,6 +332,7 @@ final class StripView implements ReaderMode {
     @Override
     public void dispose() {
         disposed = true;
+        sharpen.stop();
         for (ImageView iv : live.values()) iv.setImage(null);
         live.clear();
     }

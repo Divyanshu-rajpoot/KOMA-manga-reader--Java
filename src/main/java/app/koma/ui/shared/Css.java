@@ -10,6 +10,8 @@ public final class Css {
         String path = "/" + owner.getPackageName().replace('.', '/') + "/" + name + ".css";
         var url = owner.getResource(path);
         if (url == null) throw new IllegalStateException("Missing stylesheet " + path);
-        node.getStylesheets().add(url.toExternalForm());
+        String u = url.toExternalForm();
+        // screen sheets live on the scene (see ThemeManager); only unknown ones fall back to the node
+        if (!app.koma.core.ThemeManager.isGlobal(u)) node.getStylesheets().add(u);
     }
 }

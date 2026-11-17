@@ -6,6 +6,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
+import javafx.scene.CacheHint;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
@@ -31,6 +32,21 @@ public final class Anim {
     /** cubic-bezier(.3,1.3,.5,1): overshoots, so it can't be expressed with Interpolator.SPLINE. */
     public static final Interpolator SLAM_EASE = new CubicBezier(.3, 1.3, .5, 1);
 
+    /**
+     * Rasterizes the node once while it animates, so each frame only moves/blends a bitmap instead of
+     * re-rendering the whole subtree (the difference between 60 fps and stutter on busy screens).
+     */
+    public static void cacheWhile(Node n, Animation a) {
+        n.setCache(true);
+        n.setCacheHint(CacheHint.SPEED);
+        a.statusProperty().addListener((o, was, now) -> {
+            if (now == Animation.Status.STOPPED) {
+                n.setCache(false);
+                n.setCacheHint(CacheHint.DEFAULT);
+            }
+        });
+    }
+
     /** Plays an animation, or completes it at once when motion is reduced. Loops are not started at all. */
     public static void play(Animation a) {
         if (MotionPrefs.reduced()) {
@@ -53,13 +69,14 @@ public final class Anim {
         f.setInterpolator(EASE);
         t.setInterpolator(EASE);
         p.setDelay(MotionPrefs.reduced() ? Duration.ZERO : delay);
+        cacheWhile(n, p);
         play(p);
     }
 
-    /** Lists stagger in at 50 ms per item (capped so long lists don't drag). */
+    /** Lists stagger in at 50 ms per item. Only the first screenful animates: dozens of simultaneous fades make stutter, not polish. */
     public static void stagger(List<? extends Node> nodes) {
-        for (int i = 0; i < nodes.size(); i++) {
-            riseIn(nodes.get(i), STAGGER.multiply(Math.min(i, 16)));
+        for (int i = 0; i < Math.min(nodes.size(), 10); i++) {
+            riseIn(nodes.get(i), STAGGER.multiply(i));
         }
     }
 
@@ -67,8 +84,8 @@ public final class Anim {
     public static void slam(Node n, Duration delay) {
         n.setOpacity(0);
         ScaleTransition s = new ScaleTransition(SLAM, n);
-        s.setFromX(1.25);
-        s.setFromY(1.25);
+        s.setFromX(1.12);
+        s.setFromY(1.12);
         s.setToX(1);
         s.setToY(1);
         s.setInterpolator(SLAM_EASE);
@@ -76,6 +93,7 @@ public final class Anim {
         f.setToValue(1);
         ParallelTransition p = new ParallelTransition(n, s, f);
         p.setDelay(MotionPrefs.reduced() ? Duration.ZERO : delay);
+        cacheWhile(n, p);
         play(p);
     }
 

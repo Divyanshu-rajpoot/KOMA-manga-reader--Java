@@ -55,6 +55,11 @@ public final class CoverCarousel extends StackPane {
     private final Timeline auto;
     private Timeline turn;
     private int index;
+    // one effect pair per card, mutated every frame instead of allocating new ones (60 x 2 objects per second per card)
+    private final List<PerspectiveTransform> perspectives = new ArrayList<>();
+    private final List<ColorAdjust> grays = new ArrayList<>();
+    private double lastW = -1, lastH = -1;
+    private final javafx.beans.value.ChangeListener<Boolean> motionListener;
 
     public CoverCarousel(AppContext ctx, List<Series> series, Consumer<Series> onSelect, Consumer<Series> onOpen) {
         this.series = series;
@@ -73,6 +78,12 @@ public final class CoverCarousel extends StackPane {
             CoverView c = new CoverView(ctx, s, s.current(), 180);
             c.setManaged(false);
             c.setMouseTransparent(true);
+            ColorAdjust gray = new ColorAdjust();
+            PerspectiveTransform pt = new PerspectiveTransform();
+            pt.setInput(gray);
+            c.setEffect(pt);
+            grays.add(gray);
+            perspectives.add(pt);
             cards.add(c);
             stageLayer.getChildren().add(c);
         }
@@ -120,13 +131,17 @@ public final class CoverCarousel extends StackPane {
 
         pos.addListener((o, a, b) -> requestLayout());
         auto = new Timeline(new KeyFrame(Anim.CAROUSEL_AUTO, e -> {
-            if (!isHover() && series.size() > 1) step(1);
+            // no auto-advance while hovered or while the window is in the background
+            boolean focused = getScene() != null && getScene().getWindow() != null && getScene().getWindow().isFocused();
+            if (!isHover() && focused && series.size() > 1) step(1);
         }));
         auto.setCycleCount(Animation.INDEFINITE);
-        MotionPrefs.reducedProperty().addListener((o, a, r) -> {
+        // weak: the property is global and would otherwise keep every Home screen (and its covers) alive
+        motionListener = (o, a, r) -> {
             if (r) auto.stop();
             else if (getScene() != null) auto.play();
-        });
+        };
+        MotionPrefs.reducedProperty().addListener(new javafx.beans.value.WeakChangeListener<>(motionListener));
         sceneProperty().addListener((o, a, s) -> {
             if (s == null) auto.stop();
             else Anim.play(auto);
@@ -193,9 +208,11 @@ public final class CoverCarousel extends StackPane {
             if (d > n / 2.0) d -= n;
             double ad = Math.abs(d);
             nearest = Math.min(nearest, ad);
-            c.resize(w, h);
-            c.relocate(0, 0);
-            c.layout();
+            if (w != lastW || h != lastH) {
+                c.resize(w, h);
+                c.relocate(0, 0);
+                c.layout();
+            }
             if (ad > 2.6) {
                 c.setVisible(false);
                 continue;
@@ -213,10 +230,18 @@ public final class CoverCarousel extends StackPane {
                 pts[j * 2] = cx + (tx + xl * Math.cos(a)) * s;
                 pts[j * 2 + 1] = cy + yl * s;
             }
-            ColorAdjust gray = new ColorAdjust(0, -Math.min(1, ad) * 0.85, -Math.min(1, ad) * 0.08, 0);
-            PerspectiveTransform pt = new PerspectiveTransform(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5], pts[6], pts[7]);
-            pt.setInput(gray);
-            c.setEffect(pt);
+            ColorAdjust gray = grays.get(i);
+            gray.setSaturation(-Math.min(1, ad) * 0.85);
+            gray.setBrightness(-Math.min(1, ad) * 0.08);
+            PerspectiveTransform pt = perspectives.get(i);
+            pt.setUlx(pts[0]);
+            pt.setUly(pts[1]);
+            pt.setUrx(pts[2]);
+            pt.setUry(pts[3]);
+            pt.setLrx(pts[4]);
+            pt.setLry(pts[5]);
+            pt.setLlx(pts[6]);
+            pt.setLly(pts[7]);
             order.add(c);
             depth.add(new double[]{ad});
         }
@@ -230,6 +255,8 @@ public final class CoverCarousel extends StackPane {
         for (CoverView c : cards) if (!c.isVisible()) sorted.add(0, c);
         if (!sorted.equals(stageLayer.getChildren())) stageLayer.getChildren().setAll(sorted);
 
+        lastW = w;
+        lastH = h;
         frontShadow.resizeRelocate(cx - w / 2 + 10, cy - h / 2 + 10, w, h);
         frontShadow.setOpacity(Math.max(0, 1 - nearest * 2.5));
     }

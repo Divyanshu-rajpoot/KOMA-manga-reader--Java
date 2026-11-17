@@ -1,12 +1,9 @@
 package app.koma.ui.shared;
 
 import app.koma.AppContext;
-import app.koma.core.Anim;
 import app.koma.core.Exec;
-import app.koma.core.MotionPrefs;
 import app.koma.library.Series;
 import app.koma.library.Volume;
-import javafx.animation.FadeTransition;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -27,15 +24,25 @@ public class CoverView extends Region {
     private final Region placeholder = new Region();
     private final Halftone tone;
     private final Circle dot = new Circle();
-    private final VBox jpBox = new VBox(-4);
+    /** The vertical kanji title: ONE label with a character per line (eight separate labels were ~24 nodes per cover). */
+    private final Label jpBox = new Label();
     private final Label title = new Label();
     private final Label kind = new Label();
     private final ImageView image = new ImageView();
     private final Label badge = new Label();
     private final Region frame = new Region();
+    private final AppContext ctx;
     private long titleSize = -1;
+    private int bindId;
 
     public CoverView(AppContext ctx, Series s, Volume v, double prefWidth) {
+        this(ctx, prefWidth);
+        bind(s, v);
+    }
+
+    /** An empty cover for pooling: call {@link #bind} to show a series (or one of its volumes). */
+    public CoverView(AppContext ctx, double prefWidth) {
+        this.ctx = ctx;
         getStyleClass().add("cover");
         setPrefWidth(prefWidth);
         setMinWidth(40);
@@ -43,20 +50,12 @@ public class CoverView extends Region {
         tone = new Halftone(ctx.theme);
         dot.getStyleClass().add("cover-dot");
         title.getStyleClass().add("cover-title");
-        title.setText(Fmt.upper(s.title));
         kind.getStyleClass().add("mono-s");
-        kind.setText(Fmt.upper(s.type));
-        if (s.titleJp != null) {
-            for (int i = 0; i < Math.min(8, s.titleJp.length()); i++) {
-                Label c = new Label(String.valueOf(s.titleJp.charAt(i)));
-                c.getStyleClass().add("cover-jp");
-                jpBox.getChildren().add(c);
-            }
-        }
+        jpBox.getStyleClass().add("cover-jp");
+        jpBox.setLineSpacing(-4);
         image.setSmooth(true);
         badge.getStyleClass().add("cover-badge");
-        badge.setVisible(v != null);
-        if (v != null) badge.setText(v.label());
+        badge.setVisible(false);
         frame.getStyleClass().add("cover-frame");
         frame.setMouseTransparent(true);
         // Children sit in a clipped group so a CSS offset shadow on this node is not clipped away.
@@ -67,36 +66,81 @@ public class CoverView extends Region {
         clip.heightProperty().bind(heightProperty());
         content.setClip(clip);
         getChildren().add(content);
-
-        Volume src = v != null ? v : (s.sortedVolumes().isEmpty() ? null : s.sortedVolumes().get(0));
-        if (src != null) load(ctx, src);
     }
+
+    /** Shows a series (v == null: its first volume's cover, no volume badge) or one specific volume. */
+    public void bind(Series s, Volume v) {
+        int id = ++bindId;
+        title.setText(Fmt.upper(s.title));
+        kind.setText(Fmt.upper(s.type));
+        hasJp = s.titleJp != null && !s.titleJp.isEmpty();
+        if (hasJp) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < Math.min(8, s.titleJp.length()); i++) {
+                if (i > 0) sb.append('\n');
+                sb.append(s.titleJp.charAt(i));
+            }
+            jpBox.setText(sb.toString());
+        }
+        badge.setVisible(v != null && badgeWanted);
+        if (v != null) badge.setText(v.label());
+        image.setImage(null);
+        showPlaceholder(true);
+        Volume src = v != null ? v : (s.sortedVolumes().isEmpty() ? null : s.sortedVolumes().get(0));
+        if (src != null) load(src, id);
+        requestLayout();
+    }
+
+    private boolean badgeWanted = true;
 
     public void setBadgeVisible(boolean visible) {
-        badge.setVisible(visible);
+        badgeWanted = visible;
+        badge.setVisible(visible && !badge.getText().isEmpty());
     }
 
-    private void load(AppContext ctx, Volume v) {
+    private void load(Volume v, int id) {
         String key = app.koma.imaging.ThumbCache.key(v.path, v.size, v.mtime);
         Image hit = ctx.thumbs.peek(key);
         if (hit != null) {
-            setImage(hit, false);
+            setImage(hit);
             return;
         }
-        ctx.thumbs.cover(v.path, v.size, v.mtime).whenComplete((img, err) -> {
-            if (img != null) Exec.fx(() -> setImage(img, true));
+        // a pooled cover may be re-bound to another series while this loads: skip the work for covers scrolled past
+        ctx.thumbs.cover(v.path, v.size, v.mtime, () -> id == bindId).whenComplete((img, err) -> {
+            if (img != null) {
+                Exec.fx(() -> {
+                    if (id == bindId) setImage(img);
+                });
+            } else if (err == null) {
+                // skipped by someone else's request sharing this load: ask again if we are still showing it
+                Exec.fx(() -> {
+                    if (id != bindId) return;
+                    ctx.thumbs.cover(v.path, v.size, v.mtime).thenAccept(i2 -> Exec.fx(() -> {
+                        if (i2 != null && id == bindId) setImage(i2);
+                    }));
+                });
+            }
         });
     }
 
-    private void setImage(Image img, boolean fade) {
+    private void setImage(Image img) {
         image.setImage(img);
+        showPlaceholder(false);
         requestLayout();
-        if (fade && !MotionPrefs.reduced()) {
-            image.setOpacity(0);
-            FadeTransition f = new FadeTransition(Anim.UI, image);
-            f.setToValue(1);
-            f.play();
-        }
+    }
+
+    private boolean placeholderOn = true;
+    private boolean hasJp;
+
+    /** The ink placeholder (tone, dot, title, kanji) is hidden once the real cover is there: it is fully covered, and painting it is wasted work. */
+    private void showPlaceholder(boolean on) {
+        placeholderOn = on;
+        placeholder.setVisible(on);
+        tone.setVisible(on);
+        dot.setVisible(on);
+        title.setVisible(on);
+        kind.setVisible(on && getWidth() > 120);
+        jpBox.setVisible(on && hasJp && getWidth() > 90);
     }
 
     @Override
@@ -140,8 +184,8 @@ public class CoverView extends Region {
         double th = title.prefHeight(w - 2 * pad);
         title.resizeRelocate(pad, h - pad - th - 14, w - 2 * pad, th);
         kind.resizeRelocate(pad, h - pad - 12, w - 2 * pad, 12);
-        kind.setVisible(w > 120);
-        jpBox.setVisible(w > 90);
+        kind.setVisible(placeholderOn && w > 120);
+        jpBox.setVisible(placeholderOn && hasJp && w > 90);
 
         Image img = image.getImage();
         if (img != null && img.getWidth() > 0) {

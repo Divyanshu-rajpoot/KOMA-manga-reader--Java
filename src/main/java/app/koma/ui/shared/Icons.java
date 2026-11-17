@@ -14,6 +14,7 @@ public final class Icons {
             Map.entry("restore", "M8 4h12v12h-3v-2h1V6h-8v1H8z M4 8h12v12H4z M6 10v8h8v-8z"),
             Map.entry("close", "M5.4 4 12 10.6 18.6 4 20 5.4 13.4 12 20 18.6 18.6 20 12 13.4 5.4 20 4 18.6 10.6 12 4 5.4z"),
             Map.entry("search", "M10 3a7 7 0 1 0 4.2 12.6l5.1 5.1 1.4-1.4-5.1-5.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"),
+            Map.entry("minus", "M4 11h16v2H4z"),
             Map.entry("plus", "M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"),
             Map.entry("play", "M7 4l13 8-13 8z M9 7.6v8.8l7.2-4.4z"),
             Map.entry("left", "M15.4 4 7.4 12l8 8 1.4-1.4-6.6-6.6 6.6-6.6z"),

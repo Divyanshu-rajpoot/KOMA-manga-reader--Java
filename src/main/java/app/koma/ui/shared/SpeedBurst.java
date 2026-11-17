@@ -1,23 +1,17 @@
 package app.koma.ui.shared;
 
-import app.koma.core.Anim;
-import app.koma.core.MotionPrefs;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 /**
- * Speed-line burst: 45 thin wedges (1° every 8°) around the center, rotating once per 80 s.
- * Wedge color comes from CSS (.burst-ray); the group is cached as a bitmap while it rotates.
+ * Speed-line burst: 45 thin wedges (1° every 8°) around the center. Static: it used to rotate once per 80 s,
+ * which re-rasterized a screen-sized vector fan on every frame for as long as Home was open.
+ * Wedge color comes from CSS (.burst-ray).
  */
 public final class SpeedBurst extends Pane {
     private final Group rays = new Group();
-    private final RotateTransition spin;
 
     public SpeedBurst(double opacity) {
         getStyleClass().add("speed-burst");
@@ -32,28 +26,18 @@ public final class SpeedBurst extends Pane {
         rays.setOpacity(opacity);
         rays.setManaged(false);
         getChildren().add(rays);
+        // static now, so rasterize the fan once (pane-sized bitmap) instead of 45 screen-wide polygons on every repaint
+        setCache(true);
+        setCacheHint(javafx.scene.CacheHint.SPEED);
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(widthProperty());
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
-
-        spin = new RotateTransition(Duration.seconds(80), rays);
-        spin.setByAngle(360);
-        spin.setInterpolator(Interpolator.LINEAR);
-        spin.setCycleCount(Animation.INDEFINITE);
-        MotionPrefs.reducedProperty().addListener((o, a, reduced) -> {
-            if (reduced) spin.pause();
-            else if (getScene() != null) spin.play();
-        });
-        sceneProperty().addListener((o, a, s) -> {
-            if (s == null) spin.stop();
-            else Anim.play(spin);
-        });
     }
 
     private double radius;
 
-    /** Rays reach just past the corners; vector polygons, no bitmap cache (a cached 4k texture per burst eats VRAM). */
+    /** Rays reach just past the corners. The pane (clipped to its size, not the full fan) is cached as a bitmap. */
     @Override
     protected void layoutChildren() {
         rays.setLayoutX(getWidth() / 2);
